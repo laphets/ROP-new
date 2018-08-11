@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import App from './App.vue';
-import router from './router';
-import store from './store';
+import router from '@/router';
+import store from '@/store';
+
+import '@/permission'
 
 import Antd from 'vue-antd-ui';
 import 'vue-antd-ui/dist/antd.css';
