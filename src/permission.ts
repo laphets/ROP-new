@@ -22,11 +22,11 @@ router.beforeEach(async (to, from, next) => {
                 await store.dispatch('GetUserInfo')
                 next()
             } catch (error) {
-                if (error.data.code === 10006) {
-                    window.location.href = `https://passport.zjuqsc.com/logout`
-                } else {
+                // if (error.data.code === 10006) {
+                    // window.location.href = `https://passport.zjuqsc.com/logout`
+                // } else {
                     window.location.href = `https://passport.zjuqsc.com/login?type=new&redirect=http://dev.rop.zjuqsc.com${to.fullPath}`
-                }
+                // }
             }
         }
     }

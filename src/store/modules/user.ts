@@ -42,7 +42,10 @@ export default {
         },
         Logout({ commit }) {
             commit('SET_TOKEN', '')
+            commit('SET_INSTANCE', {instanceId: '', instanceName: ''})
             db.token.remove()
+            db.instanceId.remove()
+            db.instanceName.remove()
         },
         async GetUserInfo({ commit, state }) {
             try {

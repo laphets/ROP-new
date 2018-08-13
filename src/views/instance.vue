@@ -7,21 +7,40 @@
                     hoverable
                     >
                     <ul class="ant-card-actions opt-panel" slot="actions">
-                        <li style="width: 50%;" class="del">配置</li>
-                        <li style="width: 50%;" class="view">进入纳新</li>
+                        <li style="width: 33.33%;">
+                            <a-dropdown placement="bottomCenter">
+                                <div>
+                                配置 <a-icon type="down" />
+                                </div>
+                                <a-menu slot="overlay" @click="onClick">
+
+                                <a-menu-item key="3">更改信息</a-menu-item>
+                                <a-menu-item key="4" style="color: #ff4949;">删除实例</a-menu-item>
+                                </a-menu>
+                            </a-dropdown></li>
+                        <li style="width: 33.33%;">
+                            <a-dropdown placement="bottomCenter">
+                                <a class="ant-dropdown-link" href="#">
+                                操作 <a-icon type="poweroff" />
+                                </a>
+                                <a-menu slot="overlay" @click="onClick">
+                                <a-menu-item key="1" style="color: #43A047;">开放实例</a-menu-item>
+                                <a-menu-item key="2" style="color: #ff4949;">暂停实例</a-menu-item>
+                                </a-menu>
+                            </a-dropdown></li>
+                        <li style="width: 33.33%;" class="view" @click="enterInstance(item.ID, item.name)">进入纳新</li>
                     </ul>
                     <a-card-meta
                         :title="item.name">
                     </a-card-meta>
                     <div class="card-main">
-                        <p>状态: &nbsp&nbsp&nbsp 未开始
+                        <p>纳新状态: &nbsp&nbsp&nbsp <a-badge status="error" />未开始
                         <br>报名人数: &nbsp&nbsp&nbsp 0
                         <br>开始时间: &nbsp&nbsp&nbsp {{prase_time(item.start_time)}}
                         <br>结束时间: &nbsp&nbsp&nbsp {{prase_time(item.end_time)}}
                         <br>绑定表单: &nbsp&nbsp&nbsp {{item.form_id}}
-                        <br>创建者: &nbsp&nbsp&nbsp {{item.association}}
+                        <br>创建组织: &nbsp&nbsp&nbsp {{item.association}}
                         </p>
-
                     </div>
                 </a-card>
             </a-col>
@@ -101,6 +120,15 @@
                 <a-input />
                 </a-form-item>
                 <a-form-item
+                label='创建组织'
+                :labelCol="{ span: 5 }"
+                :wrapperCol="{ span: 12 }"
+                fieldDecoratorId="association"
+                :fieldDecoratorOptions="{rules: [{ required: false, message: '请输入纳新实例的备注' }]}"
+                >
+                <a-input />
+                </a-form-item>
+                <a-form-item
                 :wrapperCol="{ span: 12, offset: 5 }"
                 >
                 </a-form-item>
@@ -114,6 +142,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getInstanceList, createInstance, updateInstance } from '@/api/instance'
+import { successMessage } from '@/utils/message';
 @Component
 export default class InstancePageClass extends Vue {
     objStyle = {
@@ -130,6 +159,11 @@ export default class InstancePageClass extends Vue {
         this.instanceList = data
     }
 
+
+    enterInstance(instanceId: number, instanceName: string) {
+        this.$store.dispatch('SetInstance', {instanceId, instanceName})
+        successMessage(`已切换至实例${instanceName}`)
+    }
     showCreateModal() {
         this.createModalVisible = true
     }
@@ -143,14 +177,15 @@ export default class InstancePageClass extends Vue {
                         ...values,
                         start_time: time[0],
                         end_time: time[1],
-                        association: '求是潮'
                     })
-                    const myThis: any = this
-                    myThis.$message.success('纳新实例创建成功~');
+                    const { data } = (await getInstanceList()).data
+                    this.instanceList = data
+                    this.submitLoading = false;
+                    this.createModalVisible = false
+                    successMessage('纳新实例创建成功~')
                 } catch (error) {
+                    this.submitLoading = false;
                 }
-                this.submitLoading = false;
-                this.createModalVisible = false
             }
         })
     }

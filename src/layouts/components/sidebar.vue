@@ -50,12 +50,16 @@
             </a-sub-menu>
             <a-divider></a-divider>
             <a-menu-item key="19">
-                <a-icon type="rocket" />
+                <a-icon type="form" />
                 表单设计
             </a-menu-item>
             <a-menu-item key="17">
                 <a-icon type="delete" />
                 回收站
+            </a-menu-item>
+            <a-menu-item key="23">
+                <a-icon type="rocket" />
+                更新日志
             </a-menu-item>
         </a-menu>
     </div> 

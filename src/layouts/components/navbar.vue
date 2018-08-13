@@ -1,5 +1,17 @@
 <template>
     <div class="navbar">
+        <div class="left-bar-conatiner">
+            <a-dropdown v-if="instanceName">
+                <div style="cursor:default;">
+                    <a-icon type="menu-unfold" />
+                    {{instanceName}}
+                </div>
+                <a-menu slot="overlay" @click="instanceToogle">
+                    <a-menu-item key="1">切换纳新实例</a-menu-item>
+                    <a-menu-item key="2">退出当前纳新实例</a-menu-item>
+                </a-menu>
+            </a-dropdown>
+        </div>
         <div class="user-profile-container" trigger="click">
             <div class="user-profile-content">
                 <div class="menu-icons">
@@ -15,14 +27,14 @@
                     <img class="user-avatar" src="https://img.alicdn.com/tfs/TB1ONhloamWBuNjy1XaXXXCbXXa-200-200.png">
                     <span class="user-name">{{department}}  {{innerId}}</span>
                 </div>
-                <a-menu class="user-dropdown" slot="overlay">
-                    <a-menu-item>
+                <a-menu class="user-dropdown" slot="overlay" @click="meToogle">
+                    <a-menu-item key="1">
                         我的主页
                     </a-menu-item>
-                    <a-menu-item>
+                    <a-menu-item key="2">
                         个人设置
                     </a-menu-item>
-                    <a-menu-item>
+                    <a-menu-item key="3">
                         <span @click="" style="display:block;">退出</span>
                     </a-menu-item>
                 </a-menu>
@@ -35,12 +47,29 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Getter } from 'vuex-class'
-import { errorMessage } from '@/utils/message';
+import { errorMessage, successMessage } from '@/utils/message';
 
 @Component
 export default class NavbarClass extends Vue {
     @Getter('department') department!: string;
     @Getter('innerId') innerId!: string;
+    @Getter('instanceName') instanceName!: string;
+
+    instanceToogle({ key }: any) {
+        if (key === '1') {
+            this.$router.push({name: 'instance'})
+        } else if (key === '2') {
+            this.$store.dispatch('SetInstance', {instanceId: '', instanceName: ''})
+            successMessage('成功退出当前实例~')
+        }
+    }
+
+    meToogle({ key }: any) {
+        if (key === '3') {
+            this.$store.dispatch('Logout')
+            window.location.href = `https://passport.zjuqsc.com/logout`
+        }
+    }
 }
 </script>
 
@@ -48,15 +77,22 @@ export default class NavbarClass extends Vue {
 .ant-layout-header {
     line-height: 0px !important;
 }
-
+.left-bar-conatiner {
+    // position: absolute;
+    // left: 380px;
+    font-size: 16px;
+}
 .navbar {
     background: #fff !important; 
-    padding: 0;
+    padding: 0px 20px 0px 30px;
     height: 64px;
     box-shadow: 0 1px 4px rgba(0,21,41,.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
       .user-profile-container {
-    position: absolute;
-    right: 20px;
+    // position: absolute;
+    // right: 20px;
     cursor: pointer;
     .user-profile-content {
       display: flex;
