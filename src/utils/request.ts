@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError } from '_axios@0.18.0@axios'
 import db from '@/utils/db';
 import { errorMessage } from '@/utils/message';
 import store from '@/store';

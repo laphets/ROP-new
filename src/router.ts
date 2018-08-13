@@ -16,7 +16,7 @@ export const constantRoutes: RouteConfig[] = [
         component: Layout,
     },
     {
-        path: '/login_req',
+        path: '/login',
         name: 'redirect',
         component: Redirect,
     },

@@ -1,9 +1,5 @@
-import { Message } from 'element-ui'
+import { message } from 'vue-antd-ui'
 
 export const errorMessage = (errmsg: string | any): void => {
-    Message({
-        message: errmsg,
-        type: 'error',
-        duration: 5 * 1000,
-    })
+    message.error(errmsg, 5 * 1000)
 }

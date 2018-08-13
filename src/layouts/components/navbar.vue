@@ -13,7 +13,7 @@
                 <a-dropdown>
                 <div class="user-profile-body">
                     <img class="user-avatar" src="https://img.alicdn.com/tfs/TB1ONhloamWBuNjy1XaXXXCbXXa-200-200.png">
-                    <span class="user-name">求是潮</span>
+                    <span class="user-name">{{department}}  {{innerId}}</span>
                 </div>
                 <a-menu class="user-dropdown" slot="overlay">
                     <a-menu-item>
@@ -34,9 +34,13 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Getter } from 'vuex-class'
+import { errorMessage } from '@/utils/message';
+
 @Component
 export default class NavbarClass extends Vue {
-
+    @Getter('department') department!: string;
+    @Getter('innerId') innerId!: string;
 }
 </script>
 
