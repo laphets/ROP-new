@@ -34,11 +34,12 @@
                         :title="item.name">
                     </a-card-meta>
                     <div class="card-main">
-                        <p>纳新状态: &nbsp&nbsp&nbsp <a-badge status="error" />未开始
-                        <br>报名人数: &nbsp&nbsp&nbsp 0
+                        <p>纳新状态: &nbsp&nbsp&nbsp <a-badge :status="item.status === 'cur'? 'processing': (item.status === 'before'? 'error': 'success')" />
+                        {{parse_status(item.status)}}
+                        <br>报名人数: &nbsp&nbsp&nbsp {{item.freshman_count}}
                         <br>开始时间: &nbsp&nbsp&nbsp {{prase_time(item.start_time)}}
                         <br>结束时间: &nbsp&nbsp&nbsp {{prase_time(item.end_time)}}
-                        <br>绑定表单: &nbsp&nbsp&nbsp {{item.form_id}}
+                        <br>绑定表单: &nbsp&nbsp&nbsp {{item.form_name}}
                         <br>创建组织: &nbsp&nbsp&nbsp {{item.association}}
                         </p>
                     </div>
@@ -93,8 +94,8 @@
                 <a-select
                     placeholder='请选择一张报名表'
                 >
-                    <a-select-option :value='1'>求是潮一般报名表 for 2018</a-select-option>
-                    <a-select-option :value='2'>测试报名表</a-select-option>
+                    <a-select-option v-for="(item, index) in formList" :key="item.ID" :value='item.ID'>{{item.name}}</a-select-option>
+                    <!-- <a-select-option :value='2'>测试报名表</a-select-option> -->
                 </a-select>
                 </a-form-item>
                 <a-form-item
@@ -142,6 +143,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getInstanceList, createInstance, updateInstance } from '@/api/instance'
+import { getFormList } from '@/api/form'
 import { successMessage } from '@/utils/message';
 @Component
 export default class InstancePageClass extends Vue {
@@ -151,9 +153,20 @@ export default class InstancePageClass extends Vue {
     createModalVisible = false
     instanceList = []
     submitLoading = false;
+    formList = []
     prase_time(time: string) {
         return moment(new Date(time)).format('LLL')
     }
+    parse_status(status: string) {
+        if (status === 'cur') {
+            return '进行中'
+        } else if (status === 'before') {
+            return '尚未开始'
+        } else {
+            return '已结束'
+        }
+    }
+
     async created() {
         const { data } = (await getInstanceList()).data
         this.instanceList = data
@@ -165,6 +178,9 @@ export default class InstancePageClass extends Vue {
         successMessage(`已切换至实例${instanceName}`)
     }
     showCreateModal() {
+        getFormList().then(res => {
+            this.formList = (res.data).data
+        })
         this.createModalVisible = true
     }
     handleCreateSubmit(e: any) {
