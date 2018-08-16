@@ -65,11 +65,8 @@ const dataSource = [
 import { Component, Vue, Watch } from 'vue-property-decorator';
 @Component
 export default class InstancePageClass extends Vue {
-    data() {
-        return {
-            renderData: dataSource,
-        }
-    }
+            
+    renderData: object[] = dataSource
 
     // test function
 
@@ -99,12 +96,14 @@ export default class InstancePageClass extends Vue {
 
     sort(value: string) {
         let word = value
-        let newData
-        // dataSource.map((item, index) => {
-        //     if(item.title.indexOf(word)){
-        //         newData.push(item)
-        //     }
-        // }) 
+        let newData: object[] = []
+        console.log(this.renderData)
+        dataSource.map((item, index) => {
+            if (!item.title.indexOf(word)) {
+                newData.push(item)
+            }
+        })
+        this.renderData = newData 
     } 
 }
 </script>
