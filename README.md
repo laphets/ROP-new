@@ -12,5 +12,5 @@ npm run serve
 ```
 ### Build For Production
 ```
-npm run buil
+npm run build
 ```
