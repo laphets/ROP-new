@@ -1,3 +1,5 @@
+// modefied by ttfish on 8.16
+
 import Vue, { AsyncComponent } from 'vue';
 import Router, { RouteConfig } from 'vue-router';
 // import Home from '@/layouts/index.vue';
@@ -8,6 +10,7 @@ const Layout: AsyncComponent = (): any => import('@/layouts/index.vue')
 const Instance: AsyncComponent = (): any => import('@/views/instance.vue')
 const Interview: AsyncComponent = (): any => import('@/views/interview.vue')
 const Redirect: AsyncComponent = (): any => import('@/views/redirect.vue')
+const CreateForm: AsyncComponent = (): any => import('@/views/createForm.vue')
 
 export const constantRoutes: RouteConfig[] = [
     {
@@ -35,6 +38,11 @@ export const constantRoutes: RouteConfig[] = [
                 name: 'interview',
                 component: Interview,
             },
+            {
+                path: 'createForm',
+                name: 'createForm',
+                component: CreateForm,
+            },
         ]
     },
     {
@@ -44,6 +52,11 @@ export const constantRoutes: RouteConfig[] = [
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
         component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: () => import('./views/Home.vue'),
     },
 ]
 

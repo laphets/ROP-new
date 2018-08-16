@@ -50,8 +50,10 @@
             </a-sub-menu>
             <a-divider></a-divider>
             <a-menu-item key="19">
-                <a-icon type="form" />
-                表单设计
+                <router-link :to="{name: 'createForm'}">
+                    <a-icon type="form" />
+                    表单设计
+                </router-link>
             </a-menu-item>
             <a-menu-item key="17">
                 <a-icon type="delete" />
