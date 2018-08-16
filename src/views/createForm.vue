@@ -97,7 +97,7 @@ export default class InstancePageClass extends Vue {
 
     // bind search function 
 
-    sort(value) {
+    sort(value: string) {
         let word = value
         let newData
         // dataSource.map((item, index) => {
