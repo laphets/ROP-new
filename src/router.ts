@@ -8,7 +8,7 @@ Vue.use(Router);
 
 const Layout: AsyncComponent = (): any => import('@/layouts/index.vue')
 const Instance: AsyncComponent = (): any => import('@/views/instance.vue')
-const Interview: AsyncComponent = (): any => import('@/views/interview.vue')
+const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
 const Redirect: AsyncComponent = (): any => import('@/views/redirect.vue')
 const CreateForm: AsyncComponent = (): any => import('@/views/createForm.vue')
 

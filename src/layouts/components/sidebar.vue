@@ -49,6 +49,12 @@
                 <a-menu-item key="10">Option 10</a-menu-item>
             </a-sub-menu>
             <a-divider></a-divider>
+            <a-menu-item key="39">
+                <router-link :to="{name: 'createForm'}">
+                    <a-icon type="link" />
+                    链接测试
+                </router-link>
+            </a-menu-item>
             <a-menu-item key="19">
                 <router-link :to="{name: 'createForm'}">
                     <a-icon type="form" />
