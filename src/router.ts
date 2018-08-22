@@ -7,6 +7,7 @@ import Router, { RouteConfig } from 'vue-router';
 Vue.use(Router);
 
 const Layout: AsyncComponent = (): any => import('@/layouts/index.vue')
+const Index: AsyncComponent = (): any => import('@/views/index.vue')
 const Instance: AsyncComponent = (): any => import('@/views/instance.vue')
 const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
 const Redirect: AsyncComponent = (): any => import('@/views/redirect.vue')
@@ -14,14 +15,21 @@ const CreateForm: AsyncComponent = (): any => import('@/views/createForm.vue')
 
 export const constantRoutes: RouteConfig[] = [
     {
-        path: '/',
-        name: 'index111',
-        component: Layout,
-    },
-    {
         path: '/login',
         name: 'redirect',
         component: Redirect,
+    },
+    {
+        path: '',
+        name: 'home',
+        component: Layout,
+        children: [
+            {
+                path: '/',
+                name: 'index',
+                component: Index
+            },
+        ]
     },
     {
         path: '/console',

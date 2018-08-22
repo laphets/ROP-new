@@ -123,6 +123,7 @@ export default class InstancePageClass extends Vue {
 
     print() {
         console.log('print to pdf')
+        // Remain to be continued
     }
 
     trash() {
