@@ -20,14 +20,13 @@
                     hoverable
                     style="width: 250px;"
                     >   
-                        <div class="card_title">{{item.data.name}}</div> 
+                        <div class="card_title">{{item.name}}</div> 
                         <hr class="card_line">
                         <div class="card_info">
-                            
-                            <!-- These two components below is not into use !!! -->
-                            <p class="card_info_detail">{{item.info}}</p>
-                            <p class="card_edit_time">{{item.time}}</p>
-                            <!--  -->
+                            <!-- These two components below is not into use !!! on 8.22 -->
+                            <p class="card_info_detail">{{item.root_tag}}</p>
+                            <p class="card_edit_time">Latest Update Time:</p>
+                            <p class="card_edit_time">{{item.UpdatedAt}}</p>
                         
                         </div>
                         <ul class="ant-card-actions" slot="actions">
@@ -77,7 +76,8 @@ const site: string = 'http://101.132.66.238/api/v1/form'
 export default class InstancePageClass extends Vue {
             
     renderData: object[] = [] 
-    // on mount function
+
+    // onMount function
 
     dataSource: object[] = []
 
@@ -89,6 +89,7 @@ export default class InstancePageClass extends Vue {
         })
         this.dataSource = dataSource
         this.renderData = dataSource
+        console.log(dataSource)
     }
   
     // test function
@@ -99,8 +100,17 @@ export default class InstancePageClass extends Vue {
 
     // further function
 
-    star() {
-        console.log('star')
+    // About the star icon
+
+    star(event: any) {
+        let item: HTMLElement = event.path[0]
+        if (item.className === 'anticon anticon-star-o' ) {
+            item.setAttribute('class', 'anticon anticon-star')
+            console.log(1)
+        } else {
+            item.setAttribute('class', 'anticon anticon-star-o')
+            console.log(2)
+        }
     }
 
     edit() {
@@ -142,7 +152,6 @@ export default class InstancePageClass extends Vue {
     margin-left: 10%;
     margin-top: 5%;
     box-shadow: 4px 4px 4px rgb(145, 145, 145)
-
 }
 
 .card_title{
@@ -161,7 +170,7 @@ export default class InstancePageClass extends Vue {
 
 .card_edit_time{
     position: relative;
-    top: 110px;
+    top: 100px;
     font-size: 12px;
 }
 
