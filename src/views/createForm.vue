@@ -113,8 +113,12 @@ export default class InstancePageClass extends Vue {
         }
     }
 
-    edit() {
-        console.log('edit')
+    edit(event: any) {
+        let item: any = this.renderData[event.which - 1]
+        if (!item.editable) {
+            let that: any = this // SHAME!!!
+            that.$message.warning('This Form is Not Editable!')   
+        }
     }
 
     print() {
