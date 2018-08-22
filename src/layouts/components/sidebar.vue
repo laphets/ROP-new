@@ -12,8 +12,10 @@
         >
             <!-- <router-link :to="{name: 'index'}"> -->
                 <a-menu-item key="1">
-                    <a-icon type="home" />
-                    首页
+                    <router-link :to="{name: 'index'}">
+                        <a-icon type="home" />
+                        首页
+                    </router-link>
                 </a-menu-item>
             <!-- </router-link> -->
 
