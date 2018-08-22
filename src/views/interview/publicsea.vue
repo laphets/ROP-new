@@ -118,7 +118,7 @@ export default class PublicSeaClass extends Vue {
     assign_mode = ""
     waitingIntents: any = [] 
     async onAssign(key: any, record : any) {
-        this.waitingIntents = [record.ID]
+        this.waitingIntents = [record.intent_id]
         if (key == 'item_0')
             this.assign_mode = "auto"
         else if (key == "item_1")
