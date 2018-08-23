@@ -12,6 +12,7 @@ const Instance: AsyncComponent = (): any => import('@/views/instance.vue')
 const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
 const Redirect: AsyncComponent = (): any => import('@/views/redirect.vue')
 const CreateForm: AsyncComponent = (): any => import('@/views/createForm.vue')
+const TrashBin: AsyncComponent = (): any => import('@/views/trashBin.vue')
 
 export const constantRoutes: RouteConfig[] = [
     {
@@ -50,6 +51,11 @@ export const constantRoutes: RouteConfig[] = [
                 path: 'createForm',
                 name: 'createForm',
                 component: CreateForm,
+            },
+            {
+                path: '/trashbin',
+                name: 'trashBin',
+                component: TrashBin,
             },
         ]
     },
