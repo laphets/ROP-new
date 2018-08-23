@@ -64,8 +64,10 @@
                 </router-link>
             </a-menu-item>
             <a-menu-item key="17">
-                <a-icon type="delete" />
-                回收站
+                <router-link :to="{name: 'trashBin'}">
+                    <a-icon type="delete" />
+                    回收站
+                </router-link>
             </a-menu-item>
             <a-menu-item key="23">
                 <a-icon type="rocket" />
