@@ -25,9 +25,9 @@ const router = {
             const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
             
             const associationRouters = [] as RouteConfig[]
-            department.forEach((item: string) => {
+            department.forEach((item: string, index: number) => {
                 associationRouters.push({
-                    path: `view/department/${item}`,
+                    path: `view/department/${index}`,
                     name: item,
                     component: Interview,
                     meta: {
