@@ -12,3 +12,7 @@ export const getIntentList = ({mainStage, department} : any) => {
 export const assign = (data: any) => {
     return request.post(`v1/intent/assign`, data)
 }
+
+export const reject = (intentId: number) => {
+    return request.post(`v1/intent/reject/${intentId}`)
+}

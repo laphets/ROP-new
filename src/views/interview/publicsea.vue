@@ -18,7 +18,7 @@
                         </a-menu>
                     </a-dropdown>
                     <a-divider type="vertical" />
-                    <a>拒绝</a>
+                    <a class="error" @click="reject(record)">拒绝</a>
                 </span>
         </a-table>
 
@@ -70,7 +70,8 @@
 
 <script lang="ts">
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { getIntentList, assign } from '@/api/intent'
+// import { getIntentList, assign } from '@/api/intent'
+import * as intentAPI from '@/api/intent'
 import { successMessage } from '@/utils/message';
 
 import { getInterviewList } from '@/api/interview'
@@ -116,7 +117,7 @@ export default class PublicSeaClass extends Vue {
     ];
     data: any = []
     async created() {
-        this.data = ((await getIntentList({mainStage: 'Public Sea', department: this.$route.name})).data).data
+        this.data = ((await intentAPI.getIntentList({mainStage: 'Public Sea', department: this.$route.name})).data).data
     }
 
     checkGroupVisible = false
@@ -133,7 +134,7 @@ export default class PublicSeaClass extends Vue {
         
         if (this.assign_mode == "auto") {
             try {
-                await assign({assign_mode: this.assign_mode, intents: [record.intent_id]})
+                await intentAPI.assign({assign_mode: this.assign_mode, intents: [record.intent_id]})
                 successMessage(`操作成功~`)
             } catch (error) {
                 
@@ -155,7 +156,7 @@ export default class PublicSeaClass extends Vue {
                 this.submitLoading = true;
                 try {
                     // console.log(values)
-                    await assign({assign_mode: this.assign_mode, intents: this.waitingIntents, target_interview_id: values.target_interview_id})
+                    await intentAPI.assign({assign_mode: this.assign_mode, intents: this.waitingIntents, target_interview_id: values.target_interview_id})
 
                     this.submitLoading = false
                     this.checkGroupVisible = false
@@ -166,9 +167,19 @@ export default class PublicSeaClass extends Vue {
             }
         })
     }
+
+    reject(record: any) {
+        intentAPI.reject(record.intent_id).then(res => {
+            console.log(res)
+            successMessage('拒绝面试者成功~')
+        })
+    }
 }
 </script>
 <style lang="less" scoped>
+.error {
+    color: red;
+}
 .list-container {
     margin-top: 25px;
 }

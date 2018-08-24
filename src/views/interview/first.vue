@@ -10,7 +10,7 @@
                     >
                     <ul class="ant-card-actions" slot="actions">
                         <li style="width: 33.3333%;">面试管理</li>
-                        <li style="width: 33.3333%;">短信发送</li>
+                        <li style="width: 33.3333%;">面试者查看</li>
                         <li style="width: 33.3333%;">面试记录</li>
                     </ul>
                     <a-card-meta
@@ -25,10 +25,10 @@
                         <div class="status">
                             <div>
                                 <a-badge :status="item.status === 'cur'? 'processing': (item.status === 'before'? 'error': 'success')" /> {{parse_status(item.status)}}
-                                 <span class="update-at"> · 五小时前更新</span>
+                                 <span class="update-at"> · <span v-for="(intent) in item.participants" :key="intent.ID"> {{intent.name}} </span></span>
                             </div>
                             <div v-if="item.participants.length" class="avatar">
-                                <a-avatar v-for="(item1, index) in item.participants" :key="index" src="http://101.132.66.238:9000/dev/pilaoban.png" />
+                                <a-avatar v-for="(item1, index) in item.participants" :key="index" @click.native="showInfo(item1)" src="http://101.132.66.238:9000/dev/pilaoban.png" />
                             </div>
                             <div v-else>
                                 暂无面试者
@@ -40,17 +40,33 @@
             </a-row>
         </div>
         <div v-else class="list-container">
-            <a-table :columns="columns" :dataSource="data" :scroll="{ x: 1200, y: 400 }">
-                    <span slot="action" slot-scope="text">
+            <a-table :columns="columns" :dataSource="intentList" :scroll="{ x: 1300, y: 400 }">
+                    <span slot="action" slot-scope="text, record">
                         
-                        <a href="#">面试管理</a>
+                        <a @click="showInfo(record)">查看信息</a>
                         <a-divider type="vertical" />
-                        <a href="#">短信发送</a>
+                        <a >二面分配</a>
                         <a-divider type="vertical" />
-                        <a href="#">面试记录</a>
+                        <a class="error" @click="reject(record)">拒绝</a>
                     </span>
             </a-table>
         </div>
+
+
+        <a-modal
+        :title="`${modal_content.name}的个人信息`"
+        v-model="modalVisable"
+        @ok="() => this.modalVisable=false"
+        :width="1000"
+        >
+            <div>
+                <div v-for="(item, index) in modal_content.other_info" :key="index">
+                    <strong>{{item.key}}: </strong>
+                    {{item.value}}
+                </div>
+                
+            </div>
+        </a-modal>
     </div>
 </template>
 
@@ -59,10 +75,12 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import { getInterviewList } from '@/api/interview'
 import { getIntentList, assign } from '@/api/intent'
+import * as intentAPI from '@/api/intent'
 
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import { successMessage } from '@/utils/message';
 
 @Component
 export default class FirstClass extends Vue {
@@ -87,14 +105,26 @@ export default class FirstClass extends Vue {
         }
     }
 
+    modal_content = {}
+    modalVisable = false
+    showInfo(record: any) {
+        console.log('dasdas')
+        this.modal_content = {
+            ...record,
+            other_info: JSON.parse(record.other_info) 
+        }
+        this.modalVisable = true
+    }
+
     columns = [
-        { title: '编号', width: 70, dataIndex: 'age', key: 'age', fixed: 'left' },
-        { title: '面试组名', width: 120, dataIndex: 'name', key: 'name', fixed: 'left' },
-        { title: '部门', dataIndex: 'address', key: '1', width: 150 },
-        { title: '主面试官', dataIndex: 'address', key: '2', width: 150 },
-        { title: '时间', dataIndex: 'address', key: '3', width: 150 },
-        { title: '面试者', dataIndex: 'address', key: '4', width: 150 },
-        { title: '状态', dataIndex: 'address', key: '5', width: 150 },
+        { title: '编号', width: 70, dataIndex: 'ID', key: 'ID', fixed: 'left' },
+        { title: '面试者', width: 120, dataIndex: 'name', key: 'interview_id', fixed: 'left' },
+        { title: '部门', dataIndex: 'department', key: 'department', width: 150 },
+        { title: '主面试官', dataIndex: 'interview.director', key: '2', width: 150 },
+        { title: '时间', dataIndex: 'interview.start_time', key: '3', width: 250 },
+        { title: '面试组名', dataIndex: 'interview.name', key: 'name', width: 150 },
+        { title: '主状态', dataIndex: 'main_stage', key: 'main_stage', width: 100 },
+        { title: '副状态', dataIndex: 'sub_stage', key: 'sub_stage', width: 100 },
         {
             title: '操作',
             key: 'operation',
@@ -103,7 +133,6 @@ export default class FirstClass extends Vue {
             scopedSlots: { customRender: 'action' },
         },
     ];
-    data: any = []
 
     interviewList = []
     intentList = []
@@ -111,22 +140,25 @@ export default class FirstClass extends Vue {
     async created() {
         this.interviewList = ((await getInterviewList({
             interview_type: 1,
-            // department: '推广策划中心'
+            department: this.$route.name
         })).data).data
-        this.intentList = ((await getIntentList({mainStage: 'First', department: '技术研发中心'})).data).data
-        for (let i = 0; i < 100; i++) {
-            this.data.push({
-                key: i,
-                name: `Edrward ${i}`,
-                age: 32,
-                address: `London Park no. ${i}`,
-            });
-        }
+        console.log(this.$route.name)
+        this.intentList = ((await getIntentList({mainStage: 'First', department: this.$route.name})).data).data
+    }
+
+    reject(record: any) {
+        intentAPI.reject(record.intent_id).then(res => {
+            console.log(res)
+            successMessage('拒绝面试者成功~')
+        })
     }
 }
 </script>
 
 <style lang="less" scoped>
+.error {
+    color: red;
+}
 .card {
     margin-top: 20px;
     .card-body {

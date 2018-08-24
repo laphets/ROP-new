@@ -23,7 +23,7 @@
 
 
         <a-modal
-        style="top: 30px;"
+        style="top: 1px;"
         title="新建面试分组"
         v-model="createGroupVisable"
         :confirmLoading="submitLoading"
@@ -98,6 +98,16 @@
                 showTime
                 format=""
                 />
+                </a-form-item>
+
+                <a-form-item
+                label='人数上限'
+                :labelCol="{ span: 5 }"
+                :wrapperCol="{ span: 12 }"
+                fieldDecoratorId="capacity"
+                :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入这场面试的人数上限' }]}"
+                >
+                <a-input-number type="number" :min="1" />
                 </a-form-item>
 
                 <a-form-item

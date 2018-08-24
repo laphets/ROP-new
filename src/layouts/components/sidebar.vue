@@ -175,4 +175,5 @@ export default class SidebarClass extends Vue {
         margin: 12px;     
     }
 }
+
 </style>
