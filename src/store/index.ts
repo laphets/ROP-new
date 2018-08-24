@@ -10,6 +10,7 @@ import Vuex, { ModuleTree, Module } from 'vuex';
 
 import user from '@/store/modules/user'
 import app from '@/store/modules/app'
+import router from '@/store/modules/router'
 
 import { ModuleEntity } from '@/store/store.interface';
 
@@ -20,7 +21,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     modules: {
         user,
-        app
+        app,
+        router
     } as ModuleEntity,
     getters,
 });

@@ -2,10 +2,10 @@
     <div class="list-container">
         <a-table :columns="columns" :dataSource="data" :scroll="{ x: 1400, y: 450 }">
                 <span slot="action" slot-scope="text, record">
-                    <a @click="showInfo(record)" href="#" >查看信息</a>
+                    <a @click="showInfo(record)" >查看信息</a>
                     <a-divider type="vertical" />                    
                     <a-dropdown>
-                        <a class="ant-dropdown-link" href="#">
+                        <a class="ant-dropdown-link">
                         一面分配 <a-icon type="down" />
                         </a>
                         <a-menu slot="overlay" @click="({key}) => onAssign(key, record)">
@@ -18,7 +18,7 @@
                         </a-menu>
                     </a-dropdown>
                     <a-divider type="vertical" />
-                    <a href="#">拒绝</a>
+                    <a>拒绝</a>
                 </span>
         </a-table>
 
@@ -29,7 +29,11 @@
         :width="1000"
         >
             <div>
-                {{modal_content}}
+                <div v-for="(item, index) in modal_content.other_info" :key="index">
+                    <strong>{{item.key}}: </strong>
+                    {{item.value}}
+                </div>
+                
             </div>
         </a-modal>
 
@@ -84,7 +88,10 @@ export default class PublicSeaClass extends Vue {
     modal_content = {}
     modalVisable = false
     showInfo(record: any) {
-        this.modal_content = record
+        this.modal_content = {
+            ...record,
+            other_info: JSON.parse(record.other_info) 
+        }
         this.modalVisable = true
     }
 
@@ -96,7 +103,7 @@ export default class PublicSeaClass extends Vue {
         { title: '部门', dataIndex: 'department', key: '1', width: 150 },
         { title: '学号', dataIndex: 'ZJUid', key: '2', width: 150 },
         { title: '手机号', dataIndex: 'mobile', key: '3', width: 150 },
-        { title: '其他信息', dataIndex: 'other_info', key: '4', width: 150 },
+        { title: '邮箱', dataIndex: 'email', key: '4', width: 150 },
         { title: '分配状态', dataIndex: 'sub_stage', key: '5', width: 150 },
         { title: '分配组别', dataIndex: 'target_interview_id', key: '6', width: 150 },
         {
@@ -109,7 +116,7 @@ export default class PublicSeaClass extends Vue {
     ];
     data: any = []
     async created() {
-        this.data = ((await getIntentList({mainStage: 'Public Sea', department: '人力资源部门'})).data).data
+        this.data = ((await getIntentList({mainStage: 'Public Sea', department: this.$route.name})).data).data
     }
 
     checkGroupVisible = false

@@ -112,6 +112,15 @@
                 />
                 </a-form-item>
                 <a-form-item
+                label='允许志愿'
+                :labelCol="{ span: 5 }"
+                :wrapperCol="{ span: 12 }"
+                fieldDecoratorId="max_intent"
+                :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入允许最多志愿的个数' }]}"
+                >
+                <a-input-number type="number" :min="1" />
+                </a-form-item>
+                <a-form-item
                 label='纳新备注'
                 :labelCol="{ span: 5 }"
                 :wrapperCol="{ span: 12 }"
@@ -172,7 +181,9 @@ export default class InstancePageClass extends Vue {
         this.instanceList = data
     }
 
+    onClick() {
 
+    }
     enterInstance(instanceId: number, instanceName: string) {
         this.$store.dispatch('SetInstance', {instanceId, instanceName})
         successMessage(`已切换至实例${instanceName}`)

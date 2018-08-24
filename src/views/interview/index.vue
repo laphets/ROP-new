@@ -151,6 +151,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 
 import { successMessage } from '@/utils/message';
+import { watch } from 'fs';
 
 @Component({
     components: {
@@ -163,12 +164,18 @@ export default class InterviewPageClass extends Vue {
     mode = "card"
     curView = 0
     
+    department = '' as string | undefined
+
     viewType = [
         '公海',
         '一面',
         '二面'
     ]
     
+    created() {
+        this.department = this.$route.name
+    }
+
     toogleView(target: number) {
         this.curView = target
     }
