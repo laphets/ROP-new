@@ -9,7 +9,7 @@
     ]
   },
   "rules": {
-    "quotemark": false,
+    "quotemark": [true, "single"],
     "indent": [true, "spaces", 2],
     "interface-name": false,
     "ordered-imports": false,
@@ -32,7 +32,6 @@
     "one-variable-per-declaration": false,
     "no-shadowed-variable": false,
     "prefer-const": false,
-    "no-var-requires": false,
-    // "quotemark": false
+    "no-var-requires": false
   }
 }

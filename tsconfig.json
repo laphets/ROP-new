@@ -12,7 +12,8 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "types": [
-      "node"    ],
+      "node"
+    ],
     "paths": {
       "@/*": [
         "src/*"

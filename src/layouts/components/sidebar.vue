@@ -34,8 +34,10 @@
             <!-- <sidebar-item :routes="routers"></sidebar-item> -->
             <!-- <router-link :to="{name: 'index'}">
                 <a-menu-item key="1">
-                    <a-icon type="home" />
-                    首页
+                    <router-link :to="{name: 'index'}">
+                        <a-icon type="home" />
+                        首页
+                    </router-link>
                 </a-menu-item>
             </router-link>
 
@@ -85,8 +87,10 @@
                 </router-link>
             </a-menu-item>
             <a-menu-item key="17">
-                <a-icon type="delete" />
-                回收站
+                <router-link :to="{name: 'trashBin'}">
+                    <a-icon type="delete" />
+                    回收站
+                </router-link>
             </a-menu-item>
             <a-menu-item key="23">
                 <a-icon type="rocket" />

@@ -17,6 +17,8 @@ const Index: AsyncComponent = (): any => import('@/views/index.vue')
 const Instance: AsyncComponent = (): any => import('@/views/instance.vue')
 const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
 const CreateForm: AsyncComponent = (): any => import('@/views/createForm.vue')
+const TrashBin: AsyncComponent = (): any => import('@/views/trashBin.vue')
+
 
 export const constantRoutes: MyRouteConfig[] = [
     {
@@ -111,6 +113,11 @@ export const asyncRoutes: MyRouteConfig[] = [
                     title: '新建表单',
                     icon: 'form'
                 }
+            },
+            {
+                path: '/trashbin',
+                name: 'trashBin',
+                component: TrashBin,
             },
         ]
     },
