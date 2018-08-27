@@ -118,6 +118,7 @@ export const asyncRoutes: MyRouteConfig[] = [
 
 const router: Router =  new Router({
     mode: 'history',
+    base: '/manage/',
     routes: constantRoutes
 });
 
