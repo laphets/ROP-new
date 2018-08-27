@@ -1,5 +1,11 @@
 module.exports = {
   lintOnSave: false,
+  chainWebpack: config => {
+    config.plugin('html').tap(args => {
+      args[0].chunksSortMode = 'none'
+      return args
+    })
+  },
   devServer: {
     disableHostCheck: true,
     port: 80,

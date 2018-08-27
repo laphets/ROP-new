@@ -1,1 +1,1 @@
-declare module 'vue-antd-ui'
+declare module 'ant-design-vue'

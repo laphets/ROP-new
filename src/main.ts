@@ -5,8 +5,8 @@ import store from '@/store';
 
 import '@/permission'
 
-import Antd from 'vue-antd-ui';
-import 'vue-antd-ui/dist/antd.css';
+import Antd from 'ant-design-vue';
+import 'ant-design-vue/dist/antd.css';
 Vue.config.productionTip = false;
 
 Vue.use(Antd);

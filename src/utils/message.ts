@@ -1,4 +1,4 @@
-import { message } from 'vue-antd-ui'
+import { message } from 'ant-design-vue'
 
 message.config({
     duration: 2,

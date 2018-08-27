@@ -1,64 +1,53 @@
 {
-  "name": "rop-new",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
-  },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "vue": "^2.5.16",
-    "vue-antd-ui": "^1.0.1",
-    "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^7.0.0",
-    "vue-router": "^3.0.1",
-    "vuex": "^3.0.1",
-    "vuex-class": "^0.3.1",
-    "moment": "^2.22.2"
-  },
-  "devDependencies": {
-    "@vue/component-compiler-utils": "^2.1.2",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "browserslist": "^4.0.2",
-    "cache-loader": "^1.2.2",
-    "thread-loader": "^1.2.0",
-    "ts-loader": "^4.4.2",
-    "tslib": "^1.9.3",
-    "@types/axios": "^0.14.0",
-    "@vue/cli-plugin-babel": "^3.0.0-rc.10",
-    "@vue/cli-plugin-typescript": "^3.0.0-rc.10",
-    "@vue/cli-service": "^3.0.0-rc.10",
-    "babel-plugin-syntax-dynamic-import": "^6.18.0",
-    "less": "^3.0.4",
-    "less-loader": "^4.1.0",
-    "lint-staged": "^6.0.0",
-    "typescript": "^3.0.0",
-    "vue-template-compiler": "^2.5.16"
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ],
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "vue-cli-service lint",
-      "git add"
+    "name": "rop-new",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint"
+    },
+    "dependencies": {
+        "axios": "^0.18.0",
+        "moment": "^2.22.2",
+        "query-string": "^6.1.0",
+        "vue": "^2.5.17",
+        "ant-design-vue": "^1.0.3",
+        "vue-class-component": "^6.0.0",
+        "vue-property-decorator": "^7.0.0",
+        "vue-router": "^3.0.1",
+        "vuex": "^3.0.1",
+        "vuex-class": "^0.3.1"
+    },
+    "devDependencies": {
+        "@types/query-string": "^6.1.0",
+        "@vue/cli-plugin-babel": "^3.0.0",
+        "@vue/cli-plugin-typescript": "^3.0.0",
+        "@vue/cli-service": "^3.0.0",
+        "less": "^3.0.4",
+        "less-loader": "^4.1.0",
+        "lint-staged": "^7.2.2",
+        "typescript": "^3.0.0",
+        "vue-template-compiler": "^2.5.17"
+    },
+    "postcss": {
+        "plugins": {
+            "autoprefixer": {}
+        }
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions",
+        "not ie <= 8"
     ],
-    "*.vue": [
-      "vue-cli-service lint",
-      "git add"
-    ]
-  }
+    "lint-staged": {
+        "*.ts": [
+            "vue-cli-service lint",
+            "git add"
+        ],
+        "*.vue": [
+            "vue-cli-service lint",
+            "git add"
+        ]
+    }
 }
