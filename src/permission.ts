@@ -4,6 +4,8 @@ import store from '@/store';
 
 const whiteList = ['/login', '/404']
 
+const HOST = process.env.VUE_APP_HOST as string
+
 router.beforeEach(async (to, from, next) => {
     if (store.getters.ZJUid) {
         next()      
@@ -21,7 +23,7 @@ router.beforeEach(async (to, from, next) => {
                 next(to)
             } catch (error) {
                 store.dispatch('Logout')
-                window.location.href = `https://passport.zjuqsc.com/login?type=new&redirect=http://dev.rop.zjuqsc.com${to.fullPath}`
+                window.location.href = `https://passport.zjuqsc.com/login?type=new&redirect=${HOST}${to.fullPath}`
             }
         } else {
             try {
@@ -34,7 +36,7 @@ router.beforeEach(async (to, from, next) => {
                 // if (error.data.code === 10006) {
                     // window.location.href = `https://passport.zjuqsc.com/logout`
                 // } else {
-                    window.location.href = `https://passport.zjuqsc.com/login?type=new&redirect=http://dev.rop.zjuqsc.com${to.fullPath}`
+                    window.location.href = `https://passport.zjuqsc.com/login?type=new&redirect=${HOST}${to.fullPath}`
                 // }
             }
         }
