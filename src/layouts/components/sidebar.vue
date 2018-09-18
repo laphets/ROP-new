@@ -157,7 +157,7 @@ export default class SidebarClass extends Vue {
         -webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0.45) inset !important ;
         box-shadow: 0 0px 0px rgba(0, 0, 0, 0.45) inset !important;
     }
-    overflow: scroll !important;
+    overflow: auto !important;
     color: #fff !important;
     box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
     transition: width 0.28s;
