@@ -1,5 +1,5 @@
 <template>
   <div>
-    <h1>Oops 404</h1>
+    <h1>Oops Not Found</h1>
   </div>
 </template>
