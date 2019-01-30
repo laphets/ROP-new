@@ -8,11 +8,14 @@
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
+        "@types/go": "^1.6.20",
+        "ant-design-vue": "^1.0.3",
         "axios": "^0.18.0",
+        "gojs": "^1.8.35",
         "moment": "^2.22.2",
+        "npm": "^6.6.0",
         "query-string": "^6.1.0",
         "vue": "^2.5.17",
-        "ant-design-vue": "^1.0.3",
         "vue-class-component": "^6.0.0",
         "vue-property-decorator": "^7.0.0",
         "vue-router": "^3.0.1",
