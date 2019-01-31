@@ -23,6 +23,7 @@
         "vuex-class": "^0.3.1"
     },
     "devDependencies": {
+        "@types/node": "^10.12.19",
         "@types/query-string": "^6.1.0",
         "@vue/cli-plugin-babel": "^3.0.0",
         "@vue/cli-plugin-typescript": "^3.0.0",

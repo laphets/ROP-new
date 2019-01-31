@@ -12,7 +12,7 @@ const Redirect: AsyncComponent = () : any => import('@/views/redirect.vue')
 Vue.use(Router);
 
 const Layout: AsyncComponent = (): any => import('@/layouts/index.vue')
-const Index: AsyncComponent = (): any => import('@/views/index.vue')
+const Index: AsyncComponent = (): any => import('@/views/home.vue')
 const Instance: AsyncComponent = (): any => import('@/views/instance.vue')
 const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
 const CreateForm: AsyncComponent = (): any => import('@/views/createForm.vue')

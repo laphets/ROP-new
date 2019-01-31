@@ -161,7 +161,6 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 
 import { successMessage } from '@/utils/message';
-import { watch } from 'fs';
 
 @Component({
     components: {
