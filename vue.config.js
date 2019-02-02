@@ -1,7 +1,7 @@
 module.exports = {
   lintOnSave: false,
-  // baseUrl: process.env.NODE_ENV === 'production' ?
-  //   '/manage/' : '/manage/',
+  publicPath: process.env.NODE_ENV === 'production' ?
+    '/console/' : '/',
   chainWebpack: config => {
     config.plugin('html').tap(args => {
       args[0].chunksSortMode = 'none'
