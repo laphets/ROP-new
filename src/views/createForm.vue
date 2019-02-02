@@ -66,8 +66,10 @@ const dataSource = [
 }]
 
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import go,{ DraggingTool } from 'gojs';
+import go, { DraggingTool } from 'gojs';
+import { IForm, INode } from '@/interfaces/form.interface';
 var $ = go.GraphObject.make
+var form: IForm = { name: 'text', data: [] }
 @Component
 export default class InstancePageClass extends Vue {
             
@@ -121,8 +123,21 @@ export default class InstancePageClass extends Vue {
             }
         )
 
-        diagram.addDiagramListener('Modified', (e: any) => {
+        const updateForm = (vertex: any, edge: any) => {
+            var inverseMap: {[key: number]: number} = {}
+            form.data = []
+            for (var i = 0; i < vertex.length; i++) {
+                form.data.push({ tag: i + 1, type: vertex[i].type, text: vertex[i].text, next: -1 })
+                inverseMap[vertex[i].key] = i + 1
+            }
+            for (let e of edge) {
+                form.data[inverseMap[e.from] - 1].next = inverseMap[e.to]
+            }
+        }
 
+        diagram.addDiagramListener('BackgroundSingleClicked', (e: any) => {
+            updateForm(diagram.model.nodeDataArray, diagram.model.linkDataArray)
+            console.log(form)
         })
         
         const nodeStyle = [
@@ -219,8 +234,7 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { text: 'Step' }
-                    // TODO
+                    { text: '简答题' },
                 ])
             }
         )
