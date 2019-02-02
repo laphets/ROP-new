@@ -1,5 +1,5 @@
 # build stage
-FROM node:9.11.1-alpine as build-stage
+FROM node:9 as build-stage
 WORKDIR /app
 COPY package.json yarn.lock ./
 
