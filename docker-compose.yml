@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  whoami:
+    image: emilevauge/whoami
+    networks:
+      - traefik_net
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.port=80"
+        - "traefik.frontend.rule=Host:whoami.rpc.zjuqsc.com"
+        - "traefik.docker.network=traefik_net"
+  ZJUintl-gRPC:
+    image: ${IMAGE_TAG}-${CI_COMMIT_SHA}
+    networks:
+      - traefik_net
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.tags=grpc"
+        - "traefik.port=50053"
+        - "traefik.protocol=h2c"
+        - "traefik.docker.network=traefik_net"
+        - "traefik.backend=ZJUintl-gRPC"
+        #- "traefik.frontend.rule=Host:intl.rpc.zjuqsc.com"
+        - "traefik.frontend.rule=PathPrefix:/ZJUIntl.IntlService/,/ZJUIntl.BlackBoardService/"
+networks:
+  traefik_net:
+    external: true

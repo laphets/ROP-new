@@ -5,8 +5,8 @@ import Router, { RouteConfig } from 'vue-router';
 import { MyRouteConfig } from '@/interfaces/router.interface';
 // import Home from '@/layouts/index.vue';
 
-const Page404: AsyncComponent = () : any => import('@/views/404.vue')
-const Redirect: AsyncComponent = () : any => import('@/views/redirect.vue')
+const Page404: AsyncComponent = (): any => import('@/views/404.vue')
+const Redirect: AsyncComponent = (): any => import('@/views/redirect.vue')
 
 
 Vue.use(Router);

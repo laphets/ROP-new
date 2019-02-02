@@ -73,8 +73,9 @@ export default class NavbarClass extends Vue {
     }
 
     mounted() {
-        if(!this.instanceName)
+        if (!this.instanceName) {
             showNotice('info', '尚未选择纳新实例', `请在"查看纳新"页面选择你所需要查看的纳新实例`)
+        }
     }
 }
 </script>

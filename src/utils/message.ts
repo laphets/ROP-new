@@ -23,6 +23,6 @@ export const loadMessage = (errmsg: string | any): void => {
 export const showNotice = (type: string, title: string, description: string) => {
     notification[type]({
         message: title,
-        description: description,
+        description,
     });
 }
