@@ -1,19 +1,13 @@
-FROM node:9
-
-WORKDIR /usr/src/app
-
-COPY package.json *.lock ./
-
-# RUN npm i cnpm -g --registry=https://registry.npm.taobao.org
-
-# RUN cnpm i
-
-RUN npm i yarn -g --registry=https://registry.npm.taobao.org
-
-RUN yarn --registry=https://registry.npm.taobao.org
-
+# build stage
+FROM node:9.11.1-alpine as build-stage
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
 COPY . .
+RUN npm run build
 
-# EXPOSE ${app_port}
-
-CMD [ "yarn", "build" ]
+# production stage
+FROM nginx:1.13.12-alpine as production-stage
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
