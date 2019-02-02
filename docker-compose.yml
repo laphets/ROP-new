@@ -12,7 +12,7 @@ services:
         condition: on-failure
       labels:
         - "traefik.tags=http"
-        - "traefik.port=9001"
+        - "traefik.port=80"
         - "traefik.protocol=http"
         - "traefik.docker.network=traefik_net"
         - "traefik.backend=ROP-front"
