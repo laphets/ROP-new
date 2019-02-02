@@ -13,7 +13,8 @@ module.exports = {
     port: 80,
     proxy: {
       '/api': {
-        target: 'https://rop.zjuqsc.com/api',
+        // target: 'https://rop.zjuqsc.com/api',
+        target: 'http://127.0.0.1:8080',
         pathRewrite: {
           '^/api': '/'
         }
