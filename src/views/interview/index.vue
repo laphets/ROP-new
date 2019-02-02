@@ -33,7 +33,7 @@
         >
             <a-form :autoFormCreate="(form)=>{this.form = form}">
                 <a-form-item
-                label='分组类型'
+                label='面试类型'
                 :labelCol="{ span: 5 }"
                 :wrapperCol="{ span: 12 }"
                 fieldDecoratorId="interview_type"
@@ -54,17 +54,34 @@
                 fieldDecoratorId="auto_joinable"
                 :fieldDecoratorOptions="{rules: [{ required: true, message: '请选择分组类型' }]}"
                 >
+                
                 <a-select
-                    placeholder='请选择一个自动加入类型'
+                    placeholder='请选择一个面试者加入类型'
                 >
-                    <a-select-option :value='1'>自动加入</a-select-option>
-                    <a-select-option :value='-1'>手动分配</a-select-option>
+                
+                    <a-select-option :value='1'>
+                        <a-tooltip>
+                            <template slot='title'>
+                            自动分配的面试者只能够加入到该场次中
+                            </template>
+                            自动加入
+                        </a-tooltip>
+                    </a-select-option>
+                    <a-select-option :value='-1'>
+                        <a-tooltip>
+                            <template slot='title'>
+                            手动分配的面试者只能够加入到该场次中
+                            </template>
+                            手动分配
+                        </a-tooltip>
+                    </a-select-option>
+                    <!-- <a-select-option :value='-1'>手动分配</a-select-option> -->
                     <!-- <a-select-option :value='2'>测试报名表</a-select-option> -->
                 </a-select>
                 </a-form-item>
 
                 <a-form-item
-                label='分组名称'
+                label='面试名称'
                 :labelCol="{ span: 5 }"
                 :wrapperCol="{ span: 12 }"
                 fieldDecoratorId="name"

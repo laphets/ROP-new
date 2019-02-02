@@ -12,7 +12,7 @@
         >
                 <template v-for="(item, index) in routes" v-if="!item.hidden&&item.children">
                     <a-menu-item v-if="hasOneShowingChildren(item.children)"  :key="item.children[0].name">
-                        <router-link :to="item.path + '/' + item.children[0].path">
+                        <router-link :to="item.path !== '/' ? item.path : '' + '/' + item.children[0].path">
                             <a-icon :type="item.children[0].meta.icon" />{{item.children[0].meta.title}}
                         </router-link>
                     </a-menu-item>

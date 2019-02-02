@@ -19,7 +19,7 @@ router.beforeEach(async (to, from, next) => {
                 await store.dispatch('GetUserInfo') 
                 const generatedRoutes = await store.dispatch('GenerateRouters')
                 router.addRoutes(generatedRoutes)
-                console.log(generatedRoutes)
+                console.log(to)
                 next(to)
             } catch (error) {
                 store.dispatch('Logout')

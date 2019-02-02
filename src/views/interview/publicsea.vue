@@ -101,12 +101,12 @@ export default class PublicSeaClass extends Vue {
     columns = [
         { title: 'ID', width: 70, dataIndex: 'intent_id', key: 'id', fixed: 'left' },
         { title: '姓名', width: 120, dataIndex: 'name', key: 'name', fixed: 'left' },
-        { title: '部门', dataIndex: 'department', key: '1', width: 150 },
         { title: '学号', dataIndex: 'ZJUid', key: '2', width: 150 },
+        { title: '分配状态', dataIndex: 'sub_stage_str', key: '5', width: 150 },
+        { title: '面试组别', dataIndex: 'target_interview_str', key: '6', width: 150 },
+        { title: '部门', dataIndex: 'department', key: '1', width: 150 },
         { title: '手机号', dataIndex: 'mobile', key: '3', width: 150 },
         { title: '邮箱', dataIndex: 'email', key: '4', width: 150 },
-        { title: '分配状态', dataIndex: 'sub_stage', key: '5', width: 150 },
-        { title: '分配组别', dataIndex: 'target_interview_id', key: '6', width: 150 },
         {
             title: '操作',
             key: 'operation',
@@ -117,7 +117,20 @@ export default class PublicSeaClass extends Vue {
     ];
     data: any = []
     async created() {
-        this.data = ((await intentAPI.getIntentList({mainStage: 'Public Sea', department: this.$route.name})).data).data
+        const substage_map = ['未知', '未分配', '已分配未确认']
+        this.data = ((await intentAPI.getIntentList({mainStage: 'Public Sea', department: this.$route.name})).data).data.map((item: any) => {
+            let tmp_str = '';
+            if(item.sub_stage == 1) {
+                tmp_str = '未分配面试';
+            } else {
+                tmp_str = item.target_interview_id === 0 ? '自动分配,等待确认' : `${item.target_interview_id}`
+            }
+            return {
+                ...item,
+                sub_stage_str: substage_map[item.sub_stage],
+                target_interview_str: tmp_str
+            }
+        })
     }
 
     checkGroupVisible = false

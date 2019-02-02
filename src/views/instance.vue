@@ -1,11 +1,28 @@
 <template>
     <div class="page-container">
         <a-row :gutter="20">
-            <a-col v-for="(item, index) in instanceList" :key="item.ID" :span="8">
-                <a-card
+            <a-col v-for="(item, index) in instanceList" :key="item.ID" :span="8" 
+            :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
+                <div
                     class="card"
                     hoverable
                     >
+                    <div class="info">
+                        <a-card-meta
+                            :title="item.name">
+                        </a-card-meta>
+                        <div class="card-main">
+                            <div>纳新状态: &nbsp&nbsp&nbsp <a-badge :status="item.status === 'cur'? 'processing': (item.status === 'before'? 'error': 'success')" />
+                            {{parse_status(item.status)}}
+                            <br>报名人数: &nbsp&nbsp&nbsp {{item.freshman_count}}
+                            <br>开始时间: &nbsp&nbsp&nbsp {{prase_time(item.start_time)}}
+                            <br>结束时间: &nbsp&nbsp&nbsp {{prase_time(item.end_time)}}
+                            <br>绑定表单: &nbsp&nbsp&nbsp {{item.form_name}}
+                            <br>创建组织: &nbsp&nbsp&nbsp {{item.association}}
+                            </div>
+                        </div>
+                    </div>
+                    
                     <ul class="ant-card-actions opt-panel" slot="actions">
                         <li style="width: 33.33%;">
                             <a-dropdown placement="bottomCenter">
@@ -30,22 +47,10 @@
                             </a-dropdown></li>
                         <li style="width: 33.33%;" class="view" @click="enterInstance(item.ID, item.name)">进入纳新</li>
                     </ul>
-                    <a-card-meta
-                        :title="item.name">
-                    </a-card-meta>
-                    <div class="card-main">
-                        <p>纳新状态: &nbsp&nbsp&nbsp <a-badge :status="item.status === 'cur'? 'processing': (item.status === 'before'? 'error': 'success')" />
-                        {{parse_status(item.status)}}
-                        <br>报名人数: &nbsp&nbsp&nbsp {{item.freshman_count}}
-                        <br>开始时间: &nbsp&nbsp&nbsp {{prase_time(item.start_time)}}
-                        <br>结束时间: &nbsp&nbsp&nbsp {{prase_time(item.end_time)}}
-                        <br>绑定表单: &nbsp&nbsp&nbsp {{item.form_name}}
-                        <br>创建组织: &nbsp&nbsp&nbsp {{item.association}}
-                        </p>
-                    </div>
-                </a-card>
+                </div>
             </a-col>
-            <a-col :span="8">
+            <a-col :span="8"
+            :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
                 <a-card
                     class="card card-opt"
                     hoverable
@@ -226,8 +231,16 @@ export default class InstancePageClass extends Vue {
 }
 .card {
     margin-bottom: 20px;
-    height: 288px;
+    border: 1px solid #e8e8e8;
+    .info {
+        background: #ffffff;
+        padding: 20px 20px 20px 20px;
+    }
+    // height: 288px;
     .opt-panel {
+        li {
+            cursor: pointer !important;
+        }
         .del {
             color: #4A90E2;
         }
@@ -250,6 +263,7 @@ export default class InstancePageClass extends Vue {
     display: flex;
     justify-content: center;
     align-content: center;
+    height: 267px;
     .opt-container {
         text-align: center;
         vertical-align :middle;

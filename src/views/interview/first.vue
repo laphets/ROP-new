@@ -2,40 +2,45 @@
     <div>
         <div v-if="showMode === 'card'" class="card-container">
             <a-row :gutter="16">
-                <a-col v-for="(item, index) in interviewList" :key="item.ID" :span="8">
-                    <a-card
+                <a-col v-for="(item, index) in interviewList" :key="item.ID" :span="8"
+                :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
+                    <div
                     class="card"
                     hoverable
                     :bodyStyle="{padding: '18px'}"
                     >
+                    <div class="main">
+                        <a-card-meta
+                            :title="`${item.name}${item.auto_joinable==1 ? '' : '  (保留场次)'}`"
+                        >
+                        </a-card-meta>
+                        <div class="card-body">
+                            <div class="first">编号: &nbsp&nbsp&nbsp {{item.ID}}</div>
+                            <div>部门: &nbsp&nbsp&nbsp  {{item.department}}</div>
+                            <div>主面试官: &nbsp&nbsp&nbsp {{item.director}}</div>
+                            <div>时间: &nbsp&nbsp&nbsp <a-icon type="clock-circle-o" />&nbsp{{prase_time(item.start_time)}} </div>
+                            <div class="status">
+                                <div>
+                                    <a-badge :status="item.status === 'cur'? 'processing': (item.status === 'before'? 'error': 'success')" /> {{parse_status(item.status)}}
+                                    <span class="update-at"> · <span v-for="(intent) in item.participants" :key="intent.ID"> {{intent.name}} </span></span>
+                                </div>
+                                <div v-if="item.participants.length" class="avatar">
+                                    <a-avatar v-for="(item1, index) in item.participants" :key="index" @click.native="showInfo(item1)" src="http://101.132.66.238:9000/dev/pilaoban.png" />
+                                </div>
+                                <div v-else>
+                                    暂无面试者
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <ul class="ant-card-actions" slot="actions">
                         <li style="width: 33.3333%;">面试管理</li>
                         <li style="width: 33.3333%;">面试者查看</li>
                         <li style="width: 33.3333%;">面试记录</li>
                     </ul>
-                    <a-card-meta
-                        :title="`${item.name}${item.auto_joinable==1 ? '' : '  (保留场次)'}`"
-                    >
-                    </a-card-meta>
-                    <div class="card-body">
-                        <div class="first">编号: &nbsp&nbsp&nbsp {{item.ID}}</div>
-                        <div>部门: &nbsp&nbsp&nbsp  {{item.department}}</div>
-                        <div>主面试官: &nbsp&nbsp&nbsp {{item.director}}</div>
-                        <div>时间: &nbsp&nbsp&nbsp <a-icon type="clock-circle-o" />&nbsp{{prase_time(item.start_time)}} </div>
-                        <div class="status">
-                            <div>
-                                <a-badge :status="item.status === 'cur'? 'processing': (item.status === 'before'? 'error': 'success')" /> {{parse_status(item.status)}}
-                                 <span class="update-at"> · <span v-for="(intent) in item.participants" :key="intent.ID"> {{intent.name}} </span></span>
-                            </div>
-                            <div v-if="item.participants.length" class="avatar">
-                                <a-avatar v-for="(item1, index) in item.participants" :key="index" @click.native="showInfo(item1)" src="http://101.132.66.238:9000/dev/pilaoban.png" />
-                            </div>
-                            <div v-else>
-                                暂无面试者
-                            </div>
-                        </div>
+
                     </div>
-                    </a-card>
                 </a-col>
             </a-row>
         </div>
@@ -143,7 +148,15 @@ export default class FirstClass extends Vue {
             department: this.$route.name
         })).data).data
         console.log(this.$route.name)
+        // const substage_map = ['', '', '已分配未确认']
         this.intentList = ((await getIntentList({mainStage: 'First', department: this.$route.name})).data).data
+        // .map(item => {
+        //     return {
+        //         ...item,
+        //         sub_stage_str: substage_map[item.sub_stage],
+        //         target_interview_str: item.target_interview_id === 0 ? '自动分配' : `${item.target_interview_id}`
+        //     }
+        // })
     }
 
     reject(record: any) {
@@ -161,6 +174,11 @@ export default class FirstClass extends Vue {
 }
 .card {
     margin-top: 20px;
+    // margin-bottom: 20px;
+    border: 1px solid #e8e8e8;
+    .main {
+        padding: 20px;
+    }
     .card-body {
         font-size: 14px;
         .first {
