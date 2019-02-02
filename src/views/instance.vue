@@ -2,7 +2,7 @@
     <div class="page-container">
         <a-row :gutter="20">
             <a-col v-for="(item, index) in instanceList" :key="item.ID" :span="8" 
-            :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
+            :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
                 <div
                     class="card"
                     hoverable
@@ -50,7 +50,7 @@
                 </div>
             </a-col>
             <a-col :span="8"
-            :xs="24" :sm="24" :md="24" :lg="8" :xl="8">
+            :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
                 <a-card
                     class="card card-opt"
                     hoverable

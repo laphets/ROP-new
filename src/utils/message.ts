@@ -1,4 +1,4 @@
-import { message } from 'ant-design-vue'
+import { message, notification } from 'ant-design-vue'
 
 message.config({
     duration: 2,
@@ -18,4 +18,11 @@ export const warnMessage = (errmsg: string | any): void => {
 }
 export const loadMessage = (errmsg: string | any): void => {
     message.load(errmsg)
+}
+
+export const showNotice = (type: string, title: string, description: string) => {
+    notification[type]({
+        message: title,
+        description: description,
+    });
 }

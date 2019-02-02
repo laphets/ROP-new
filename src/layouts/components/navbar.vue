@@ -47,7 +47,8 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Getter } from 'vuex-class'
-import { errorMessage, successMessage } from '@/utils/message';
+import { errorMessage, successMessage, showNotice } from '@/utils/message';
+
 
 @Component
 export default class NavbarClass extends Vue {
@@ -69,6 +70,11 @@ export default class NavbarClass extends Vue {
             this.$store.dispatch('Logout')
             window.location.href = `https://passport.zjuqsc.com/logout`
         }
+    }
+
+    mounted() {
+        if(!this.instanceName)
+            showNotice('info', '尚未选择纳新实例', `请在"查看纳新"页面选择你所需要查看的纳新实例`)
     }
 }
 </script>
