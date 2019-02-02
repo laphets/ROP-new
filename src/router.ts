@@ -34,7 +34,7 @@ export const constantRoutes: MyRouteConfig[] = [
 
 export const asyncRoutes: MyRouteConfig[] = [
     {
-        path: '',
+        path: '/',
         component: Layout,
         redirect: '/index',
         name: 'indexroot',
