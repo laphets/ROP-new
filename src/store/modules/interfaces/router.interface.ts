@@ -8,6 +8,6 @@
 import { MyRouteConfig } from '@/interfaces/router.interface';
 
 export interface RouterState {
-    routers : MyRouteConfig[],
-    generatedRouters : MyRouteConfig[]
+    routers: MyRouteConfig[],
+    generatedRouters: MyRouteConfig[]
 }

@@ -1,0 +1,32 @@
+image: docker:stable
+
+services:
+  - docker:dind
+
+variables:
+  CONTAINER_IMAGE: harbor.zjuqsc.com/rop/front
+  IMAGE_TAG: harbor.zjuqsc.com/rop/front:$CI_COMMIT_REF_SLUG
+  SERVICE_NAME: ROP-front
+
+before_script:
+  - docker login -u docker -p $DOCKER_PASSWORD harbor.zjuqsc.com
+
+# test:
+#   stage: test
+#   tags:
+#     - deploy
+#   script:
+#     - docker pull $IMAGE_TAG || true
+#     - docker build --cache-from $IMAGE_TAG -t $IMAGE_TAG .
+#     - docker push $IMAGE_TAG
+
+build-and-deploy:
+  stage: deploy
+  tags:
+    - deploy
+    # - swarm
+  script:
+    - docker pull $IMAGE_TAG || true
+    - docker build --cache-from $IMAGE_TAG -t $IMAGE_TAG-$CI_COMMIT_SHA .
+    - docker push $IMAGE_TAG-$CI_COMMIT_SHA
+    - docker stack deploy --with-registry-auth --compose-file=docker-compose.yml ${SERVICE_NAME}

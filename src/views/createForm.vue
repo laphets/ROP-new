@@ -68,8 +68,8 @@ const dataSource = [
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import go, { DraggingTool } from 'gojs';
 import { IForm, INode } from '@/interfaces/form.interface';
-var $ = go.GraphObject.make
-var form: IForm = { name: 'text', data: [] }
+let $ = go.GraphObject.make
+let form: IForm = { name: 'text', data: [] }
 @Component
 export default class InstancePageClass extends Vue {
             
@@ -114,10 +114,10 @@ export default class InstancePageClass extends Vue {
     }
 
     mounted() {
-        var diagram = $(go.Diagram, 'diagram', {
-                initialContentAlignment: go.Spot.Center,
-                allowDrop: true,
-                scrollsPageOnFocus: false,
+        let diagram = $(go.Diagram, 'diagram', {
+                "initialContentAlignment": go.Spot.Center,
+                "allowDrop": true,
+                "scrollsPageOnFocus": false,
                 'undoManager.isEnabled': true,
                 'grid.visible': false
             }
@@ -161,7 +161,7 @@ export default class InstancePageClass extends Vue {
                 toLinkable: input,
                 cursor: 'pointer',
                 mouseEnter: (e: any, port: any) => {
-                    if (!e.diagram.isReadOnly) port.fill = 'rgba(255,0,255,0.5)'
+                    if (!e.diagram.isReadOnly) { port.fill = 'rgba(255,0,255,0.5)' }
                 },
                 mouseLeave: (e: any, port: any) => {
                     port.fill = 'transparent'
@@ -210,7 +210,7 @@ export default class InstancePageClass extends Vue {
                 new go.Binding('points').makeTwoWay(),
                 $(go.Shape, { isPanelMain: true, strokeWidth: 8, stroke: 'transparent', name: 'HIGHLIGHT' }),
                 $(go.Shape, { isPanelMain: true, stroke: 'gray', strokeWidth: 2 },
-                    new go.Binding('stroke', 'isSelected', (sel: boolean) => { return sel ? 'dodgerblue' : 'gray' }).ofObject()),
+                    new go.Binding('stroke', 'isSelected', (sel: boolean) => sel ? 'dodgerblue' : 'gray').ofObject()),
                 $(go.Shape, { toArrow: 'standard', strokeWidth: 0, fill: 'gray' }),
                 $(go.Panel, 'Auto', { visible: false, name: 'LABEL', segmentIndex: 2, segmentFraction: 0.5 },
                     new go.Binding('visible', 'visible').makeTwoWay(),
@@ -230,7 +230,7 @@ export default class InstancePageClass extends Vue {
 
         diagram.startTransaction('new object')
 
-        var palette = $(go.Palette, 'palette', {
+        let palette = $(go.Palette, 'palette', {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([

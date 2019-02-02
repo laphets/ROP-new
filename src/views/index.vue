@@ -35,13 +35,15 @@ export default class IndexPageClass extends Vue {
           listData = [
             { type: 'warning', content: '技术研发中心第一场面试.' },
             { type: 'success', content: 'This is usual event.' },
-          ]; break;
+          ]; 
+          break;
         case 10:
           listData = [
             { type: 'warning', content: '技术研发中心第一场面试.' },
             { type: 'success', content: 'This is usual event.' },
             { type: 'error', content: 'This is error event.' },
-          ]; break;
+          ]; 
+          break;
         case 15:
           listData = [
             { type: 'warning', content: '技术研发中心第一场面试' },
@@ -50,7 +52,8 @@ export default class IndexPageClass extends Vue {
             { type: 'error', content: 'This is error event 2.' },
             { type: 'error', content: 'This is error event 3.' },
             { type: 'error', content: 'This is error event 4.' },
-          ]; break;
+          ]; 
+          break;
         default:
       }
       return listData || [];

@@ -96,7 +96,7 @@ export default class PublicSeaClass extends Vue {
         this.modalVisable = true
     }
 
-    createGroupVisable=false
+    createGroupVisable = false
 
     columns = [
         { title: 'ID', width: 70, dataIndex: 'intent_id', key: 'id', fixed: 'left' },
@@ -120,7 +120,7 @@ export default class PublicSeaClass extends Vue {
         const substage_map = ['未知', '未分配', '已分配未确认']
         this.data = ((await intentAPI.getIntentList({mainStage: 'Public Sea', department: this.$route.name})).data).data.map((item: any) => {
             let tmp_str = '';
-            if(item.sub_stage == 1) {
+            if (item.sub_stage === 1) {
                 tmp_str = '未分配面试';
             } else {
                 tmp_str = item.target_interview_id === 0 ? '自动分配,等待确认' : `${item.target_interview_id}`
@@ -138,21 +138,22 @@ export default class PublicSeaClass extends Vue {
 
     assign_mode = ""
     waitingIntents: any = [] 
-    async onAssign(key: any, record : any) {
+    async onAssign(key: any, record: any) {
         this.waitingIntents = [record.intent_id]
-        if (key == 'item_0')
+        if (key === 'item_0') {
             this.assign_mode = "auto"
-        else if (key == "item_1")
+        } else if (key === "item_1") {
             this.assign_mode = "manual"
+        }
         
-        if (this.assign_mode == "auto") {
+        if (this.assign_mode === "auto") {
             try {
                 await intentAPI.assign({assign_mode: this.assign_mode, intents: [record.intent_id]})
                 successMessage(`操作成功~`)
             } catch (error) {
                 
             }
-        } else if (this.assign_mode == "manual") {
+        } else if (this.assign_mode === "manual") {
             this.availableGroup = ((await getInterviewList({
                 interview_type: 1,
                 auto_joinable: -1,

@@ -208,7 +208,7 @@ export default class InterviewPageClass extends Vue {
 
     departmentList = []
 
-    createGroupVisable=false
+    createGroupVisable = false
     async showCreateGroup() {
         this.departmentList = (((await getDepartmentList()).data).data).department
         this.createGroupVisable = true
