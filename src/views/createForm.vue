@@ -124,9 +124,9 @@ export default class InstancePageClass extends Vue {
         )
 
         const updateForm = (vertex: any, edge: any) => {
-            var inverseMap: {[key: number]: number} = {}
+            let inverseMap: {[key: number]: number} = {}
             form.data = []
-            for (var i = 0; i < vertex.length; i++) {
+            for (let i = 0; i < vertex.length; i++) {
                 form.data.push({ tag: i + 1, type: vertex[i].type, text: vertex[i].text, next: -1 })
                 inverseMap[vertex[i].key] = i + 1
             }
