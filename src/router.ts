@@ -117,7 +117,7 @@ export const asyncRoutes: MyRouteConfig[] = [
 
 const router: Router =  new Router({
     mode: 'history',
-    // base: '/',
+    base: '/console/',
     routes: constantRoutes
 });
 
