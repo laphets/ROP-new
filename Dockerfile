@@ -16,8 +16,10 @@ RUN yarn build
 FROM nginx:1.13.12-alpine as production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html/
 
+WORKDIR /app
+
 RUN rm /etc/nginx/conf.d/default.conf
-ADD /app/nginx/default.conf /etc/nginx/conf.d/
+ADD nginx/default.conf /etc/nginx/conf.d/
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
