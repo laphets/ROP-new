@@ -7,6 +7,7 @@ const whiteList = ['/login', '/404']
 const HOST = process.env.VUE_APP_HOST as string
 
 router.beforeEach(async (to, from, next) => {
+    // debugger
     if (store.getters.ZJUid) {
         next()      
     } else {

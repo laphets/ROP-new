@@ -70,7 +70,7 @@ const dataSource = [
 }]
 
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import go, { DraggingTool, Diagram, Palette, GraphLinksModel } from 'gojs';
+import go, { DraggingTool, Diagram, Palette, GraphLinksModel } from 'fuckgojs';
 import { IForm } from '@/interfaces/form.interface';
 import { getFormList } from '@/api/form';
 import { successMessage, errorMessage } from '@/utils/message';
