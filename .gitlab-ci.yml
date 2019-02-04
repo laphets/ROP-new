@@ -21,6 +21,8 @@ before_script:
 #     - docker push $IMAGE_TAG
 
 build-and-deploy:
+  only: 
+    - master
   stage: deploy
   tags:
     - deploy
