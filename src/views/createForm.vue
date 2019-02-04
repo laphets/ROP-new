@@ -11,9 +11,11 @@
             >
             </a-input-search>
 
-                <div v-for="item in formList" :key="item.ID">
+                <div v-for="(item,index) in formList" :key="item.ID">
                     <div
                     class="card"
+                    :class="selectedIndex == index? 'selected': ''"
+                    @click="togoSelect(index)"
                     >
                         <div class="body">
                             <div class="title">{{item.name}}</div> 
@@ -69,17 +71,26 @@ export default class InstancePageClass extends Vue {
     palette = {} as Palette
     form = { name: 'text', data: []} as IForm
     buttonDisabled = true
+    selectedIndex = 0;
 
     async created() {
         const { data } = (await getFormList()).data
         console.log(data)
         this.formList = data;
+
+        // this.$nextTick(() => {
+        //     // this.selectedId = 0;
+        // })
         // this.renderData = data
         // console.log('data', this.renderData);
     }
 
     parse_time(time: any) {
         return moment(new Date(time)).format('LLL')
+    }
+
+    togoSelect(index: number) {
+        this.selectedIndex = index;
     }
 
     // further function
@@ -289,23 +300,30 @@ export default class InstancePageClass extends Vue {
     .form-container {
         padding: 0px 20px;
         width: 310px;
+        .selected {
+            border: 2px solid #4291f7 !important;
+        }
         .card {
+            cursor: pointer;
+            ul {
+                border-radius: 8px !important;
+            }
             margin-top: 10px;
             width: 100%;
             height: 180px;
-            border: 1px solid #e8e8e8;
+            border: 2px solid #e8e8e8;
             background: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border-radius: 5px;
+            border-radius: 8px;
             .body {
                 padding: 16px 16px 0px 16px;
                 height: 100%;
                 position: relative;
                 .title {
                     font-size: 16px;
-                    font-weight: 500;
+                    font-weight: 400;
                     color: #4A4A4A;
                 }
                 .line {
