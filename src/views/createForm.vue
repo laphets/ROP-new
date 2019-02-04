@@ -35,9 +35,15 @@
         </div>
 
         <div class="gojs-container">
-            <div class="tips">
-                <a-button :disabled="buttonDisabled" @click="save" :type="'primary'">保存</a-button>
-                (tips: Ctrl+C/V 复制粘贴, Delete 删除, Ctrl+Z/Y 撤销/重做)
+            <div class="btn-container">
+                <div class="left">
+                    <a-button :type="'primary'">新建表单</a-button>
+                </div>
+                <div class="right">
+                    <a-button >全部清空</a-button>
+                    <a-button >撤销操作</a-button>
+                    <a-button :disabled="buttonDisabled" @click="save" :type="'primary'">保存</a-button>
+                </div>
             </div>
             <div id="palette" style="height: 10%;"></div>
             <div id="diagram" style="height: 90%;"></div>
@@ -47,26 +53,6 @@
 </template>
 
 <script lang="ts">
-const dataSource = [
-{
-    ID: 1,
-    name: '2018春纳报名表',
-    info: '这是求是潮2018春季纳新报名表',
-    UpdatedAt: 'Last Edit Time is 2017.12.1 20:35'
-}, 
-{
-    ID: 2,
-    name: '跳跳鱼',
-    info: '跳跳鱼啦啦啦啦啦啦',
-    UpdatedAt: 'Last Edit Time is 2008.1.1 23:12'
- 
-}, {
-    ID: 3,
-    name: '裸犇的报名表',
-    info: '哈哈哈哈哈哈哈啊哈哈哈哈哈',
-    UpdatedAt: 'Last Edit Time is 1908.3.6 08:48'
-}]
-
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import go, { DraggingTool, Diagram, Palette, GraphLinksModel } from 'fuckgojs';
 import { IForm } from '@/interfaces/form.interface';
@@ -117,15 +103,15 @@ export default class InstancePageClass extends Vue {
     // bind search function 
 
     sort(value: string) {
-        let word = value
-        let newData: object[] = []
-        console.log(this.formList)
-        dataSource.map((item, index) => {
-            if (!item.name.indexOf(word)) {
-                newData.push(item)
-            }
-        })
-        this.formList = newData 
+        // let word = value
+        // let newData: object[] = []
+        // console.log(this.formList)
+        // dataSource.map((item, index) => {
+        //     if (!item.name.indexOf(word)) {
+        //         newData.push(item)
+        //     }
+        // })
+        // this.formList = newData 
     }
 
     mounted() {
@@ -285,12 +271,27 @@ export default class InstancePageClass extends Vue {
         background-color: white;
         height: calc(100vh - 110px);
         width: calc(100vw - 600px);
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+        border-radius: 4px;
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 4px;
+            .right {
+                button {
+                    margin: 0px 4px;
+                }
+            }
+        }
     }
     .form-container {
         padding: 0px 20px;
+        width: 310px;
         .card {
             margin-top: 10px;
-            width: 270px;
+            width: 100%;
             height: 180px;
             border: 1px solid #e8e8e8;
             background: #ffffff;
