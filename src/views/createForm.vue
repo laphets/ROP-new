@@ -20,11 +20,11 @@
                     hoverable
                     style="width: 250px;"
                     >   
-                        <div class="card_title">{{item.title}}</div> 
+                        <div class="card_title">{{item.name}}</div> 
                         <hr class="card_line">
                         <div class="card_info">
                             <p class="card_info_detail">{{item.info}}</p>
-                            <p class="card_edit_time">{{item.time}}</p>
+                            <p class="card_edit_time">{{item.UpdatedAt}}</p>
                         </div>
                         <ul class="ant-card-actions" slot="actions">
                             <li style="width: 25%;"><a-icon type="star-o" @click="star" /></li>
@@ -37,6 +37,10 @@
         </div>
 
         <div class="working_area">
+            <div class="tips">
+                <a-button :disabled="buttonDisabled" @click="save" :type="'primary'">保存</a-button>
+                (tips: Ctrl+C/V 复制粘贴, Delete 删除, Ctrl+Z/Y 撤销/重做)
+            </div>
             <div id="palette" style="height: 10%;"></div>
             <div id="diagram" style="height: 90%;"></div>
         </div>
@@ -47,38 +51,43 @@
 <script lang="ts">
 const dataSource = [
 {
-    id: 1,
-    title: '2018春纳报名表',
+    ID: 1,
+    name: '2018春纳报名表',
     info: '这是求是潮2018春季纳新报名表',
-    time: 'Last Edit Time is 2017.12.1 20:35'
+    UpdatedAt: 'Last Edit Time is 2017.12.1 20:35'
 }, 
 {
-    id: 2,
-    title: '跳跳鱼',
+    ID: 2,
+    name: '跳跳鱼',
     info: '跳跳鱼啦啦啦啦啦啦',
-    time: 'Last Edit Time is 2008.1.1 23:12'
+    UpdatedAt: 'Last Edit Time is 2008.1.1 23:12'
  
 }, {
-    id: 3,
-    title: '裸犇的报名表',
+    ID: 3,
+    name: '裸犇的报名表',
     info: '哈哈哈哈哈哈哈啊哈哈哈哈哈',
-    time: 'Last Edit Time is 1908.3.6 08:48'
+    UpdatedAt: 'Last Edit Time is 1908.3.6 08:48'
 }]
 
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import go, { DraggingTool } from 'gojs';
-import { IForm, INode } from '@/interfaces/form.interface';
+import go, { DraggingTool, Diagram, Palette, GraphLinksModel } from 'gojs';
+import { IForm } from '@/interfaces/form.interface';
+import { getFormList } from '@/api/form';
+import { successMessage, errorMessage } from '@/utils/message';
 let $ = go.GraphObject.make
-let form: IForm = { name: 'text', data: [] }
 @Component
 export default class InstancePageClass extends Vue {
             
     renderData: object[] = dataSource
+    diagram = {} as Diagram
+    palette = {} as Palette
+    form = { name: 'text', data: []} as IForm
+    buttonDisabled = true
 
-    // test function
-
-    fish() {
-        console.log('ttfish')
+    async created() {
+        const { data } = (await getFormList()).data
+        this.renderData = data
+        console.log('data', this.renderData);
     }
 
     // further function
@@ -106,7 +115,7 @@ export default class InstancePageClass extends Vue {
         let newData: object[] = []
         console.log(this.renderData)
         dataSource.map((item, index) => {
-            if (!item.title.indexOf(word)) {
+            if (!item.name.indexOf(word)) {
                 newData.push(item)
             }
         })
@@ -115,31 +124,17 @@ export default class InstancePageClass extends Vue {
 
     mounted() {
         let diagram = $(go.Diagram, 'diagram', {
-                "initialContentAlignment": go.Spot.Center,
-                "allowDrop": true,
-                "scrollsPageOnFocus": false,
-                'undoManager.isEnabled': true,
-                'grid.visible': false
-            }
-        )
-
-        const updateForm = (vertex: any, edge: any) => {
-            let inverseMap: {[key: number]: number} = {}
-            form.data = []
-            for (let i = 0; i < vertex.length; i++) {
-                form.data.push({ tag: i + 1, type: vertex[i].type, text: vertex[i].text, next: -1 })
-                inverseMap[vertex[i].key] = i + 1
-            }
-            for (let e of edge) {
-                form.data[inverseMap[e.from] - 1].next = inverseMap[e.to]
-            }
-        }
-
-        diagram.addDiagramListener('BackgroundSingleClicked', (e: any) => {
-            updateForm(diagram.model.nodeDataArray, diagram.model.linkDataArray)
-            console.log(form)
+            'initialContentAlignment': go.Spot.Center,
+            'allowDrop': true,
+            'scrollsPageOnFocus': false,
+            'undoManager.isEnabled': true,
+            'grid.visible': false
         })
-        
+
+        diagram.addDiagramListener('Modified', (e: any) => {
+            this.buttonDisabled = !diagram.isModified
+        })
+
         const nodeStyle = [
             new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
             { locationSpot: go.Spot.Center }
@@ -174,7 +169,7 @@ export default class InstancePageClass extends Vue {
             stroke: "whitesmoke"
         }
 
-        diagram.nodeTemplateMap.add('', 
+        diagram.nodeTemplateMap.add('TEXT', 
             $(go.Node, 'Table', nodeStyle, 
                 $(go.Panel, 'Auto', 
                     $(go.Shape, 'Rectangle',
@@ -188,10 +183,8 @@ export default class InstancePageClass extends Vue {
                     },
                     new go.Binding('text').makeTwoWay())
                 ),
-                makePort('T', go.Spot.Top, go.Spot.TopSide, false, true),
-                makePort('L', go.Spot.Left, go.Spot.LeftSide, true, true),
-                makePort('R', go.Spot.Right, go.Spot.RightSide, true, true),
-                makePort('B', go.Spot.Bottom, go.Spot.BottomSide, true, false)
+                makePort('T', go.Spot.Top, go.Spot.Top, false, true),
+                makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
         ))
 
         diagram.linkTemplate =
@@ -228,32 +221,48 @@ export default class InstancePageClass extends Vue {
         diagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal
         diagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal
 
-        diagram.startTransaction('new object')
+        // diagram.startTransaction('new object')
+        let model = $(go.GraphLinksModel)
+        model.linkFromPortIdProperty = "fromPort"  // necessary to remember portIds
+        model.linkToPortIdProperty = "toPort"
+        diagram.model = model
 
         let palette = $(go.Palette, 'palette', {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { text: '简答题' },
+                    { category: 'TEXT', text: '简答题' },
                 ])
             }
         )
-        // diagram.nodeTemplate = $(go.Node, "Vertical", {
-        //     locationSpot: go.Spot.Center,
-        //     locationObjectName: "SHAPE",
-        //     selectionAdorned: false,
-        //     resizable: true, resizeObjectName: "SHAPE",
-        //     rotatable: true, rotateObjectName: "SHAPE",
-        //     layoutConditions: go.Part.LayoutStandard & ~go.Part.LayoutNodeSized
-        // }, new go.Binding("layerName", "isHighlighted", function(h) { return h ? "Foreground" : ""; }).ofObject(), 
-        //     $(go.Shape, {
-        //         name: "SHAPE",
-        //         width: 70, height: 70,
-        //         stroke: "#C2185B",
-        //         fill: "#F48FB1",
-        //         strokeWidth: 3
-        //     },)
-        // )
+
+        this.diagram = diagram
+        this.palette = palette
+    }
+
+    judge(data: any[]) {
+        return true
+    }
+
+    save() {
+        let inverseMap: {[key: number]: number} = {}
+        let data = []
+        const { nodeDataArray, linkDataArray } = this.diagram.model as any
+        for (let i = 0; i < nodeDataArray.length; i++) {
+            data.push({ tag: i + 1, type: nodeDataArray[i].category, text: nodeDataArray[i].text, next: -1})
+            inverseMap[nodeDataArray[i].key] = i + 1
+        }
+        for (let e of linkDataArray) {
+            data[inverseMap[e.from] - 1].next = inverseMap[e.to]
+        }
+        console.log('data:', data);
+        if (this.judge(data)) {
+            successMessage('保存成功！')
+            this.form.data = data
+            this.diagram.isModified = false
+        } else {
+            errorMessage('表单逻辑错误，保存失败！')
+        }
     }
 }
 </script>
@@ -294,5 +303,8 @@ export default class InstancePageClass extends Vue {
 
 .card{
     margin: 10% 10%
+}
+.tips{
+    margin: 1% 1%
 }
 </style>
