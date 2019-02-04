@@ -1,42 +1,40 @@
 <template>
     <div class="page-container">
 
-        <div class="formList" style="width: 250px">
-            
+        <div class="form-container">
             <a-input-search
-            class="certain-category-search"
+            class="search"
             size="large"
-            style="width: 100%; margin: 10% 10% 0"
             placeholder="请输入要查找的表单名称"
             @search="sort"
             enterButton
             >
             </a-input-search>
 
-                <div v-for="item in renderData" :key="item.title">
-                    <a-card
+                <div v-for="item in formList" :key="item.ID">
+                    <div
                     class="card"
-                    :bordered="false"
-                    hoverable
-                    style="width: 250px;"
-                    >   
-                        <div class="card_title">{{item.name}}</div> 
-                        <hr class="card_line">
-                        <div class="card_info">
-                            <p class="card_info_detail">{{item.info}}</p>
-                            <p class="card_edit_time">{{item.UpdatedAt}}</p>
-                        </div>
-                        <ul class="ant-card-actions" slot="actions">
+                    >
+                        <div class="body">
+                            <div class="title">{{item.name}}</div> 
+                            <div class="line"></div>
+                            <!-- <div class="info">
+                                <p class="info_detail">{{item.info}}</p>
+                            </div> -->
+                            <div class="update">最后更新日期:{{parse_time(item.UpdatedAt)}}</div>
+                        </div> 
+
+                        <ul class="action ant-card-actions" slot="actions">
                             <li style="width: 25%;"><a-icon type="star-o" @click="star" /></li>
                             <li style="width: 25%;"><a-icon type="form" @click="edit"/></li>
                             <li style="width: 25%;"> <a-icon type="file-pdf" @click="print"/></li>
                             <li style="width: 25%;"> <a-icon type="delete" @click="trash"/></li>
                         </ul>
-                    </a-card>
+                    </div>
                 </div>
         </div>
 
-        <div class="working_area">
+        <div class="gojs-container">
             <div class="tips">
                 <a-button :disabled="buttonDisabled" @click="save" :type="'primary'">保存</a-button>
                 (tips: Ctrl+C/V 复制粘贴, Delete 删除, Ctrl+Z/Y 撤销/重做)
@@ -74,11 +72,13 @@ import go, { DraggingTool, Diagram, Palette, GraphLinksModel } from 'fuckgojs';
 import { IForm } from '@/interfaces/form.interface';
 import { getFormList } from '@/api/form';
 import { successMessage, errorMessage } from '@/utils/message';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
 let $ = go.GraphObject.make
 @Component
 export default class InstancePageClass extends Vue {
             
-    renderData: object[] = dataSource
+    formList = [] as object[];
     diagram = {} as Diagram
     palette = {} as Palette
     form = { name: 'text', data: []} as IForm
@@ -86,8 +86,14 @@ export default class InstancePageClass extends Vue {
 
     async created() {
         const { data } = (await getFormList()).data
-        this.renderData = data
-        console.log('data', this.renderData);
+        console.log(data)
+        this.formList = data;
+        // this.renderData = data
+        // console.log('data', this.renderData);
+    }
+
+    parse_time(time: any) {
+        return moment(new Date(time)).format('LLL')
     }
 
     // further function
@@ -113,13 +119,13 @@ export default class InstancePageClass extends Vue {
     sort(value: string) {
         let word = value
         let newData: object[] = []
-        console.log(this.renderData)
+        console.log(this.formList)
         dataSource.map((item, index) => {
             if (!item.name.indexOf(word)) {
                 newData.push(item)
             }
         })
-        this.renderData = newData 
+        this.formList = newData 
     }
 
     mounted() {
@@ -268,43 +274,55 @@ export default class InstancePageClass extends Vue {
 </script>
 
 <style lang="less" scoped>
+.action {
+    border-top: 0px !important;
+    background: #ffffff !important;
+}
 .page-container{
-    display: flex
+    display: flex;
+    padding: 30px 0px;
+    .gojs-container{
+        background-color: white;
+        height: calc(100vh - 110px);
+        width: calc(100vw - 600px);
+    }
+    .form-container {
+        padding: 0px 20px;
+        .card {
+            margin-top: 10px;
+            width: 270px;
+            height: 180px;
+            border: 1px solid #e8e8e8;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-radius: 5px;
+            .body {
+                padding: 16px 16px 0px 16px;
+                height: 100%;
+                position: relative;
+                .title {
+                    font-size: 16px;
+                    font-weight: 500;
+                    color: #4A4A4A;
+                }
+                .line {
+                    height: 1px;
+                    margin: 4px 0px;
+                    background: #E9E9E9;
+                }
+                .update {
+                    position: absolute;
+                    bottom: 0;
+                    font-size: 11px;
+                    color: #9B9B9B;
+                }
+            }
+        }
+    }
+
 }
 
-.working_area{
-    background-color: white;
-    height: 900px;
-    width: 700px;
-    margin-left: 10%;
-    margin-top: 5%;
-    box-shadow: 4px 4px 4px rgb(145, 145, 145)
-}
 
-.card_title{
-    font-weight: bold;
-    font-size: 16px
-}
-
-.card_info{
-    height: 160px;
-    opacity: 0.7;
-}
-
-.card_line{
-    opacity: 0.5;
-}
-
-.card_edit_time{
-    position: relative;
-    top: 110px;
-    font-size: 12px;
-}
-
-.card{
-    margin: 10% 10%
-}
-.tips{
-    margin: 1% 1%
-}
 </style>
