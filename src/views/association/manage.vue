@@ -16,7 +16,7 @@
                     <a slot="actions">管理</a>
                     <a slot="actions">更多</a>
                     <a-list-item-meta
-                        :description="item.department"
+                        :description="`${item.department} - Last Seen: ${get_relative_time(item.last_seen)}`"
                     >
                         <a slot="title" href="https://vuecomponent.github.io/ant-design-vue/">{{item.inner_id}}</a>
                             <a-avatar slot="avatar" :style="{backgroundColor: colorList[index % colorList.length], verticalAlign: 'middle'}"> {{item.inner_id[0]}} </a-avatar>
@@ -34,6 +34,9 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { getUserList } from '@/api/association';
 
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+
 @Component
 export default class AssociationManagePageClass extends Vue {
     loading = true;
@@ -41,6 +44,10 @@ export default class AssociationManagePageClass extends Vue {
     colorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae']
     loadingMore = false;
     showLoadingMore = true;
+
+    get_relative_time(time: string) {
+        return time === '0001-01-01T00:00:00Z' ? '很久以前' : moment(new Date(time)).fromNow()
+    }
 
     async created() {
         const { data } = (await getUserList()).data
