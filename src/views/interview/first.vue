@@ -25,7 +25,7 @@
                                     <span class="update-at"> · <span v-for="(intent) in item.participants" :key="intent.ID"> {{intent.name}} </span></span>
                                 </div>
                                 <div v-if="item.participants.length" class="avatar">
-                                    <a-avatar v-for="(item1, index) in item.participants" :key="index" @click.native="showInfo(item1)" src="http://101.132.66.238:9000/dev/pilaoban.png" />
+                                    <a-avatar class="avatar" v-for="(item1, index) in item.participants" :key="index" @click.native="showInfo(item1)" :style="{backgroundColor: colorList[index % colorList.length], verticalAlign: 'middle'}"> {{item1.name[0]}} </a-avatar>
                                 </div>
                                 <div v-else>
                                     暂无面试者
@@ -97,6 +97,8 @@ export default class FirstClass extends Vue {
         this.$emit('update:showmode', newvalue)
     }
     
+    colorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae']
+
     prase_time(time: string) {
         return moment(new Date(time)).format('LLL')
     }
@@ -171,6 +173,11 @@ export default class FirstClass extends Vue {
 <style lang="less" scoped>
 .error {
     color: red;
+}
+.avatar {
+    font-size: 12px !important;
+    line-height: 25px !important;
+    cursor: pointer;
 }
 .card {
     margin-top: 20px;

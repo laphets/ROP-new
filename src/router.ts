@@ -16,6 +16,9 @@ const Index: AsyncComponent = (): any => import('@/views/index.vue')
 const Instance: AsyncComponent = (): any => import('@/views/instance.vue')
 const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
 const CreateForm: AsyncComponent = (): any => import('@/views/createForm.vue')
+const AssociationView: AsyncComponent = (): any => import('@/views/association/view.vue')
+const AssociationManage: AsyncComponent = (): any => import('@/views/association/manage.vue')
+
 
 export const constantRoutes: MyRouteConfig[] = [
     {
@@ -69,6 +72,36 @@ export const asyncRoutes: MyRouteConfig[] = [
                 meta: {
                     title: '查看纳新',
                     icon: 'compass'
+                }
+            },
+        ]
+    },
+    {
+        path: '/association',
+        component: Layout,
+        redirect: '/association/view',
+        name: 'association',
+        meta: {
+            title: '组织管理',
+            icon: 'team'
+        },
+        children: [
+            {
+                path: 'view',
+                name: 'viewassociation',
+                component: AssociationView,
+                meta: {
+                    title: '查看组织',
+                    icon: 'solution'
+                }
+            },
+            {
+                path: 'manage',
+                name: 'manageassociation',
+                component: AssociationManage,
+                meta: {
+                    title: '成员管理',
+                    icon: 'fork'
                 }
             },
         ]
