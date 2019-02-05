@@ -19,7 +19,8 @@
                         :description="`${item.department} - Last Seen: ${get_relative_time(item.last_seen)}`"
                     >
                         <a slot="title" href="https://vuecomponent.github.io/ant-design-vue/">{{item.inner_id}}</a>
-                            <a-avatar slot="avatar" :style="{backgroundColor: colorList[index % colorList.length], verticalAlign: 'middle'}"> {{item.inner_id[0]}} </a-avatar>
+                            <a-avatar v-if="!item.avatar" slot="avatar" :style="{backgroundColor: colorList[index % colorList.length], verticalAlign: 'middle'}"> {{item.inner_id[0]}} </a-avatar>
+                            <a-avatar v-else slot="avatar" :src="item.avatar" :style="{ verticalAlign: 'middle'}"> </a-avatar>
 
                     </a-list-item-meta>
                     <div>提醒面试</div>
