@@ -12,7 +12,7 @@
             <img v-if="imageUrl" :src="imageUrl" alt="avatar" />
             <div v-else>
                 <a-icon :type="loading ? 'loading' : 'plus'" />
-                <div class="ant-upload-text">Upload</div>
+                <div class="ant-upload-text">选择头像</div>
             </div>
         </a-upload>
     </div>
@@ -21,6 +21,8 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { uploadImage } from '@/api/file';
+import { updateAvatar } from '@/api/user';
+import { successMessage } from '@/utils/message';
 
 
 function getBase64(img: any, callback: any) {
@@ -47,6 +49,9 @@ export default class UserPageClass extends Vue {
         const { data } = (await uploadImage(file.file)).data
         this.imageUrl = data
         this.loading = false
+        await updateAvatar(this.imageUrl)
+        this.$store.dispatch('SetAvatar', { avatar: this.imageUrl })
+        successMessage('头像更新成功~')
     }
     beforeUpload(file: any) {
         console.log(file)

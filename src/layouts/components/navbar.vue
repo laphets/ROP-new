@@ -24,7 +24,7 @@
                 </div>
                 <a-dropdown>
                 <div class="user-profile-body">
-                    <img class="user-avatar" src="https://img.alicdn.com/tfs/TB1ONhloamWBuNjy1XaXXXCbXXa-200-200.png">
+                    <img class="user-avatar" :src="avatar">
                     <span class="user-name">{{department}}  {{innerId}}</span>
                 </div>
                 <a-menu class="user-dropdown" slot="overlay" @click="meToogle">
@@ -55,6 +55,7 @@ export default class NavbarClass extends Vue {
     @Getter('department') department!: string;
     @Getter('innerId') innerId!: string;
     @Getter('instanceName') instanceName!: string;
+    @Getter('avatar') avatar!: string;
 
     instanceToogle({ key }: any) {
         if (key === '1') {

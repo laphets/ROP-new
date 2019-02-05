@@ -9,6 +9,7 @@ export default {
         name: '',
         innerId: '',
         department: '',
+        avatar: '',
         token: db.token.get()
     },
     mutations: {
@@ -28,6 +29,9 @@ export default {
             state.token = token
             db.token.set(token)
         },
+        SET_AVATAR: (state, avatar) => {
+            state.avatar = avatar;
+        }
     },
     actions: {
         async Login({ commit }): Promise<any> {
@@ -49,15 +53,19 @@ export default {
         },
         async GetUserInfo({ commit, state }) {
             try {
-                const { ZJUid, name, inner_id, department } = ((await getUserInfo()).data).data
+                const { ZJUid, name, inner_id, department, avatar } = ((await getUserInfo()).data).data
                 commit('SET_ZJUID', ZJUid)
                 commit('SET_NAME', name)
                 commit('SET_INNERID', inner_id)
                 commit('SET_DEPARTMENT', department)
+                commit('SET_AVATAR', avatar)
                 return { ZJUid, name, inner_id, department }
             } catch (error) {
                 return Promise.reject(error)
             }
+        },
+        SetAvatar({ commit }, { avatar }) {
+            commit('SET_AVATAR', avatar)
         }
     }
 } as Module<UserState, any>

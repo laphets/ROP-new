@@ -8,3 +8,7 @@ export const login = () => {
 export const getUserInfo = () => {
     return request.get<UserInfoResponse>('v1/user/info')
 }
+
+export const updateAvatar = (url: string) => {
+    return request.post('v1/user/avatar', {url})
+}

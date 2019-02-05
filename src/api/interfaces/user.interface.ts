@@ -4,5 +4,6 @@ export interface UserInfoResponse {
         readonly name: string;
         readonly department: string;
         readonly inner_id: string;
+        readonly avatar: string;
     }
 }

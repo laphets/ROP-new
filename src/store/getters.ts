@@ -21,6 +21,7 @@ export default {
     ZJUid: state => state.user.ZJUid,
     name: state => state.user.name,
     innerId: state => state.user.innerId,
+    avatar: state => state.user.avatar,
     department: state => state.user.department,
     token: state => state.user.token,
     instancdId: state => state.app.instanceId,

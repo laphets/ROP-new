@@ -4,4 +4,5 @@ export interface UserState {
     innerId: string;
     department: string;
     token: string;
+    avatar: string;
 }
