@@ -11,11 +11,11 @@
             >
             </a-input-search>
 
-                <div v-for="(item,index) in formList" :key="item.ID">
+                <div v-for="item in renderList" :key="item.ID">
                     <div
                     class="card"
-                    :class="selectedIndex == index? 'selected': ''"
-                    @click="togoSelect(index)"
+                    :class="selectedID == item.ID? 'selected': ''"
+                    @click="togoSelect(item.ID)"
                     >
                         <div class="body">
                             <div class="title">{{item.name}}</div> 
@@ -68,16 +68,20 @@ let $ = go.GraphObject.make
 export default class InstancePageClass extends Vue {
             
     formList = [{ name: '' }] as RawForm[]
+    renderList = [] as object[]
     diagram = {} as Diagram
     form = {} as IForm
     buttonDisabled = true
-    selectedIndex = 0;
+    selectedID = 0;
 
     async created() {
         const { data } = (await getFormList()).data
         this.formList = data
+        data.forEach((item: RawForm)=> {
+            this.renderList.push({ name: item.name, ID: item.ID, UpdatedAt: item.UpdatedAt })
+        })
         // this.$nextTick(() => {
-        //     // this.selectedId = 0;
+        //     // this.selectedID = 0;
         // })
         // this.renderData = data
         // console.log('data', this.renderData);
@@ -109,17 +113,25 @@ export default class InstancePageClass extends Vue {
     }
 
     async loadForm() {
-        let selectedForm = this.formList[this.selectedIndex]
+        let self = this
+        let selectedForm = {} as RawForm
+        this.formList.every((item: RawForm) => {
+            if (item.ID === self.selectedID) {
+                selectedForm = item
+                return false
+            }
+            return true
+        })
         this.form = { name: selectedForm.name, data: JSON.parse(selectedForm.data) }
         this.diagram.model = await this.generateModel(this.form.data)
     }
 
-    async togoSelect(index: number) {
+    async togoSelect(ID: number) {
         if (this.diagram.isModified) {
             errorMessage('当前表单未保存！')
             // TODO
         } else {
-            this.selectedIndex = index
+            this.selectedID = ID
             await this.loadForm()
         }
     }
@@ -145,15 +157,14 @@ export default class InstancePageClass extends Vue {
     // bind search function 
 
     sort(value: string) {
-        // let word = value
-        // let newData: RawForm[] = []
-        // console.log(this.formList)
-        // this.formList.map((item: RawForm, index: number) => {
-        //     if (item.name && !item.name.indexOf(word)) {
-        //         newData.push(item)
-        //     }
-        // })
-        // this.formList = newData
+        let word = value
+        let newData: object[] = []
+        this.formList.map((item: RawForm, index: number) => {
+            if (item.name && !item.name.indexOf(word)) {
+                newData.push({ name: item.name, ID: item.ID, UpdatedAt: item.UpdatedAt })
+            }
+        })
+        this.renderList = newData
     }
 
     mounted() {
