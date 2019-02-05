@@ -47,10 +47,11 @@
                     <a-button :disabled="buttonDisabled" @click="handleSave" :type="'primary'">保存</a-button>
                 </div>
             </div>
-            <div id="palette" style="height: 10%;"></div>
-            <div id="diagram" style="height: 90%;"></div>
+            <div class="editor-container">
+                <div id="palette" style="height: 15%;"></div>
+                <div id="diagram" style="height: 85%;"></div>
+            </div>
         </div>
-
     </div>
 </template>
 
@@ -99,7 +100,7 @@ export default class InstancePageClass extends Vue {
         for (let node of data) {
             NArray.push({ key: node.tag, category: node.type, text: node.text })
             if (node.next !== -1) {
-                LArray.push({ from: node.tag, to: node.next })
+                LArray.push({ from: node.tag, to: node.next, fromPort: 'R', toPort: 'L'/* temp */ })
             }
         }
         model.nodeDataArray = NArray
@@ -107,19 +108,19 @@ export default class InstancePageClass extends Vue {
         return model
     }
 
-    loadForm() {
+    async loadForm() {
         let selectedForm = this.formList[this.selectedIndex]
         this.form = { name: selectedForm.name, data: JSON.parse(selectedForm.data) }
-        this.diagram.model = this.generateModel(this.form.data)
+        this.diagram.model = await this.generateModel(this.form.data)
     }
 
-    togoSelect(index: number) {
+    async togoSelect(index: number) {
         if (this.diagram.isModified) {
             errorMessage('当前表单未保存！')
             // TODO
         } else {
             this.selectedIndex = index
-            this.loadForm()
+            await this.loadForm()
         }
     }
 
@@ -202,29 +203,30 @@ export default class InstancePageClass extends Vue {
             stroke: "whitesmoke"
         }
 
-        const nodeTemplate = $(go.Node, 'Table', nodeStyle, 
-            $(go.Panel, 'Auto', 
-                $(go.Shape, 'Rectangle',
-                    { fill: '#00A9C9', strokeWidth: 0 },
-                    new go.Binding('figure', 'figure')),
-                $(go.TextBlock, textStyle, {
-                    margin: 8,
-                    maxSize: new go.Size(160, NaN),
-                    wrap: go.TextBlock.WrapFit,
-                    editable: true
-                },
-                new go.Binding('text').makeTwoWay())
-            ),
-            makePort('T', go.Spot.Top, go.Spot.Top, false, true),
-            makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
-        )
+        const createNode = (shape: string) =>
+            $(go.Node, 'Table', nodeStyle, 
+                $(go.Panel, 'Auto', 
+                    $(go.Shape, shape,
+                        { fill: '#00A9C9', strokeWidth: 0 },
+                        new go.Binding('figure', 'figure')),
+                    $(go.TextBlock, textStyle, {
+                        margin: 8,
+                        maxSize: new go.Size(160, NaN),
+                        wrap: go.TextBlock.WrapFit,
+                        editable: true
+                    },
+                    new go.Binding('text').makeTwoWay())
+                ),
+                makePort('L', go.Spot.Left, go.Spot.Left, false, true),
+                makePort('R', go.Spot.Right, go.Spot.Right, true, false)
+            )
 
-        diagram.nodeTemplateMap.add('TEXT', nodeTemplate)
-        diagram.nodeTemplateMap.add('TEXTAREA', nodeTemplate)
-        diagram.nodeTemplateMap.add('INPUT', nodeTemplate)
-        diagram.nodeTemplateMap.add('UPLOAD', nodeTemplate)
-        diagram.nodeTemplateMap.add('BOX', nodeTemplate)
-        diagram.nodeTemplateMap.add('SELECT', nodeTemplate)
+        diagram.nodeTemplateMap.add('TEXT', createNode('RoundedRectangle'))
+        diagram.nodeTemplateMap.add('TEXTAREA', createNode('Rectangle'))
+        diagram.nodeTemplateMap.add('INPUT', createNode('Rectangle'))
+        diagram.nodeTemplateMap.add('UPLOAD', createNode('Ellipse'))
+        diagram.nodeTemplateMap.add('BOX', createNode('Diamond'))
+        diagram.nodeTemplateMap.add('SELECT', createNode('Rectangle'))
 
         diagram.linkTemplate =
             $(go.Link, {
@@ -330,6 +332,8 @@ export default class InstancePageClass extends Vue {
         padding: 20px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
         border-radius: 4px;
+        flex-flow: column;
+        display: flex;
         .btn-container {
             display: flex;
             justify-content: space-between;
@@ -340,6 +344,9 @@ export default class InstancePageClass extends Vue {
                     margin: 0px 4px;
                 }
             }
+        }
+        .editor-container {
+            flex: 1;
         }
     }
     .form-container {
