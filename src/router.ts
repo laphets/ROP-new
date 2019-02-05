@@ -14,6 +14,7 @@ Vue.use(Router);
 const Layout: AsyncComponent = (): any => import('@/layouts/index.vue')
 const Index: AsyncComponent = (): any => import('@/views/index.vue')
 const Instance: AsyncComponent = (): any => import('@/views/instance.vue')
+const User: AsyncComponent = (): any => import('@/views/user.vue')
 const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
 const CreateForm: AsyncComponent = (): any => import('@/views/createForm.vue')
 const AssociationView: AsyncComponent = (): any => import('@/views/association/view.vue')
@@ -142,6 +143,26 @@ export const asyncRoutes: MyRouteConfig[] = [
                 meta: {
                     title: '新建表单',
                     icon: 'form'
+                }
+            },
+        ]
+    },
+    {
+        path: '/user',
+        component: Layout,
+        redirect: '/user/view',
+        name: 'user',
+        meta: {
+            title: '个人信息',
+        },
+        children: [
+            {
+                path: 'view',
+                name: 'userview',
+                component: User,
+                meta: {
+                    title: '个人信息',
+                    icon: 'user'
                 }
             },
         ]
