@@ -42,9 +42,9 @@
                     <a-button :type="'primary'">新建表单</a-button>
                 </div>
                 <div class="right">
-                    <a-button >全部清空</a-button>
-                    <a-button >撤销操作</a-button>
-                    <a-button :disabled="buttonDisabled" @click="save" :type="'primary'">保存</a-button>
+                    <a-button @click="handleClear">全部清空</a-button>
+                    <a-button @click="handleUndo">撤销操作</a-button>
+                    <a-button :disabled="buttonDisabled" @click="handleSave" :type="'primary'">保存</a-button>
                 </div>
             </div>
             <div id="palette" style="height: 10%;"></div>
@@ -56,8 +56,8 @@
 
 <script lang="ts">
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import go, { DraggingTool, Diagram, Palette, GraphLinksModel } from 'fuckgojs';
-import { IForm } from '@/interfaces/form.interface';
+import go, { DraggingTool, Diagram, GraphLinksModel } from 'fuckgojs';
+import { RawForm, IForm, INode } from '@/interfaces/form.interface';
 import { getFormList } from '@/api/form';
 import { successMessage, errorMessage } from '@/utils/message';
 import moment from 'moment';
@@ -66,18 +66,15 @@ let $ = go.GraphObject.make
 @Component
 export default class InstancePageClass extends Vue {
             
-    formList = [] as object[];
+    formList = [{ name: '' }] as RawForm[]
     diagram = {} as Diagram
-    palette = {} as Palette
-    form = { name: 'text', data: []} as IForm
+    form = {} as IForm
     buttonDisabled = true
     selectedIndex = 0;
 
     async created() {
         const { data } = (await getFormList()).data
-        console.log(data)
-        this.formList = data;
-
+        this.formList = data
         // this.$nextTick(() => {
         //     // this.selectedId = 0;
         // })
@@ -89,8 +86,41 @@ export default class InstancePageClass extends Vue {
         return moment(new Date(time)).format('LLL')
     }
 
+    createEmptyModel() {
+        let model = $(go.GraphLinksModel)
+        model.linkFromPortIdProperty = 'fromPort'
+        model.linkToPortIdProperty = 'toPort'
+        return model
+    }
+
+    generateModel(data: INode[]) {
+        let model = this.createEmptyModel()
+        let NArray = [], LArray = []
+        for (let node of data) {
+            NArray.push({ key: node.tag, category: node.type, text: node.text })
+            if (node.next !== -1) {
+                LArray.push({ from: node.tag, to: node.next })
+            }
+        }
+        model.nodeDataArray = NArray
+        model.linkDataArray = LArray
+        return model
+    }
+
+    loadForm() {
+        let selectedForm = this.formList[this.selectedIndex]
+        this.form = { name: selectedForm.name, data: JSON.parse(selectedForm.data) }
+        this.diagram.model = this.generateModel(this.form.data)
+    }
+
     togoSelect(index: number) {
-        this.selectedIndex = index;
+        if (this.diagram.isModified) {
+            errorMessage('当前表单未保存！')
+            // TODO
+        } else {
+            this.selectedIndex = index
+            this.loadForm()
+        }
     }
 
     // further function
@@ -115,14 +145,14 @@ export default class InstancePageClass extends Vue {
 
     sort(value: string) {
         // let word = value
-        // let newData: object[] = []
+        // let newData: RawForm[] = []
         // console.log(this.formList)
-        // dataSource.map((item, index) => {
-        //     if (!item.name.indexOf(word)) {
+        // this.formList.map((item: RawForm, index: number) => {
+        //     if (item.name && !item.name.indexOf(word)) {
         //         newData.push(item)
         //     }
         // })
-        // this.formList = newData 
+        // this.formList = newData
     }
 
     mounted() {
@@ -172,23 +202,29 @@ export default class InstancePageClass extends Vue {
             stroke: "whitesmoke"
         }
 
-        diagram.nodeTemplateMap.add('TEXT', 
-            $(go.Node, 'Table', nodeStyle, 
-                $(go.Panel, 'Auto', 
-                    $(go.Shape, 'Rectangle',
-                        { fill: '#00A9C9', strokeWidth: 0 },
-                        new go.Binding('figure', 'figure')),
-                    $(go.TextBlock, textStyle, {
-                        margin: 8,
-                        maxSize: new go.Size(160, NaN),
-                        wrap: go.TextBlock.WrapFit,
-                        editable: true
-                    },
-                    new go.Binding('text').makeTwoWay())
-                ),
-                makePort('T', go.Spot.Top, go.Spot.Top, false, true),
-                makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
-        ))
+        const nodeTemplate = $(go.Node, 'Table', nodeStyle, 
+            $(go.Panel, 'Auto', 
+                $(go.Shape, 'Rectangle',
+                    { fill: '#00A9C9', strokeWidth: 0 },
+                    new go.Binding('figure', 'figure')),
+                $(go.TextBlock, textStyle, {
+                    margin: 8,
+                    maxSize: new go.Size(160, NaN),
+                    wrap: go.TextBlock.WrapFit,
+                    editable: true
+                },
+                new go.Binding('text').makeTwoWay())
+            ),
+            makePort('T', go.Spot.Top, go.Spot.Top, false, true),
+            makePort('B', go.Spot.Bottom, go.Spot.Bottom, true, false)
+        )
+
+        diagram.nodeTemplateMap.add('TEXT', nodeTemplate)
+        diagram.nodeTemplateMap.add('TEXTAREA', nodeTemplate)
+        diagram.nodeTemplateMap.add('INPUT', nodeTemplate)
+        diagram.nodeTemplateMap.add('UPLOAD', nodeTemplate)
+        diagram.nodeTemplateMap.add('BOX', nodeTemplate)
+        diagram.nodeTemplateMap.add('SELECT', nodeTemplate)
 
         diagram.linkTemplate =
             $(go.Link, {
@@ -225,29 +261,38 @@ export default class InstancePageClass extends Vue {
         diagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal
 
         // diagram.startTransaction('new object')
-        let model = $(go.GraphLinksModel)
-        model.linkFromPortIdProperty = "fromPort"  // necessary to remember portIds
-        model.linkToPortIdProperty = "toPort"
-        diagram.model = model
+        diagram.model = this.createEmptyModel()
 
         let palette = $(go.Palette, 'palette', {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
                     { category: 'TEXT', text: '简答题' },
+                    { category: 'TEXTAREA', text: '论述题' },
+                    { category: 'INPUT', text: '输入框' },
+                    { category: 'UPLOAD', text: '文件上传' },
+                    { category: 'BOX', text: 'BOX' },
+                    { category: 'SELECT', text: '选择题' },
                 ])
             }
         )
 
         this.diagram = diagram
-        this.palette = palette
     }
 
     judge(data: any[]) {
         return true
     }
 
-    save() {
+    handleClear() {
+        this.diagram.model = this.createEmptyModel()
+    }
+
+    handleUndo() {
+        this.loadForm()
+    }
+
+    handleSave() {
         let inverseMap: {[key: number]: number} = {}
         let data = []
         const { nodeDataArray, linkDataArray } = this.diagram.model as any
@@ -258,7 +303,7 @@ export default class InstancePageClass extends Vue {
         for (let e of linkDataArray) {
             data[inverseMap[e.from] - 1].next = inverseMap[e.to]
         }
-        console.log('data:', data);
+        console.log('link:', linkDataArray);
         if (this.judge(data)) {
             successMessage('保存成功！')
             this.form.data = data
