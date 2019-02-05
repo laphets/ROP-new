@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
         <div class="logo">
-            <span class="site-name">求是潮纳新开放系统</span>
+            <span class="site-name">求是潮纳新开放平台</span>
         </div>
 
         <a-menu
