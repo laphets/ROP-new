@@ -1,7 +1,7 @@
 export interface IChoice {
-    tag?: number;
-    text?: string;
-    next?: number;
+    tag: number;
+    text: string;
+    next: number;
 }
 
 export interface INode {
