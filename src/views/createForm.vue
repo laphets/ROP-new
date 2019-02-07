@@ -65,6 +65,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 let $ = go.GraphObject.make
 const typeMap: {[key: string]: string} = { 'TEXT': '简答题', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '上传文件', 'BOX': 'BOX', 'SELECT': '选择题' }
+const nxt = { id: 'B', 'text': '默认跳转' }
 @Component
 export default class InstancePageClass extends Vue {
             
@@ -103,7 +104,7 @@ export default class InstancePageClass extends Vue {
         let model = this.createEmptyModel()
         let NArray = [], LArray = []
         for (let item of data) {
-            let node = { key: item.tag, category: item.type, text: item.text, choices: [] as object[] }
+            let node = { key: item.tag, category: item.type, text: item.text, choices: [nxt] as object[] }
             if (item.next !== -1) {
                 LArray.push({ from: item.tag, to: item.next, fromPort: 'B', toPort: 'T' })
             }
@@ -226,11 +227,6 @@ export default class InstancePageClass extends Vue {
             })
         }
 
-        const textStyle = {
-            font: 'bold 11pt Helvetica, Arial, sans-serif',
-            stroke: 'whitesmoke'
-        }
-
         const fontFamily = 'Microsoft YaHei, PingFang SC, Helvetica Neue, Helvetica, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif'
 
         const addNode = (type: string) => diagram.nodeTemplateMap.add(type, 
@@ -263,10 +259,7 @@ export default class InstancePageClass extends Vue {
                         text: '请输入问题'
                     }, new go.Binding('text', 'text').makeTwoWay()),
                     $(go.Panel, 'Horizontal', { alignment: go.Spot.BottomCenter },
-                        new go.Binding('itemArray', 'choices', (a: object[]) => {
-                            a.push({ id: 'B', text: '下一题' })
-                            return a
-                        }),
+                        new go.Binding('itemArray', 'choices'),
                         {
                             row: 2, column: 0,
                             itemTemplate: $(go.Panel, 'Auto', {
@@ -351,12 +344,12 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', title: '简答题', choices: [] },
-                    { category: 'TEXTAREA', title: '论述题', choices: [] },
-                    { category: 'INPUT', title: '输入框', choices: [] },
-                    { category: 'UPLOAD', title: '文件上传', choices: [] },
-                    { category: 'BOX', title: 'BOX', choices: [] },
-                    { category: 'SELECT', title: '选择题', choices: [ { id: 1, text: 'A'}, { id: 2, text: 'B'}, { id: 3, text: 'C'}, { id: 4, text: 'D'}, ] }
+                    { category: 'TEXT', choices: [nxt] },
+                    { category: 'TEXTAREA', choices: [nxt] },
+                    { category: 'INPUT', choices: [nxt] },
+                    { category: 'UPLOAD', choices: [nxt] },
+                    { category: 'BOX', choices: [nxt] },
+                    { category: 'SELECT', choices: [ nxt, { id: 1, text: 'A'}, { id: 2, text: 'B'}, { id: 3, text: 'C'}, { id: 4, text: 'D'} ] }
                 ])
             }
         )
@@ -377,15 +370,29 @@ export default class InstancePageClass extends Vue {
     }
 
     handleSave() {
-        let inverseMap: {[key: number]: number} = {}
-        let data = []
-        const { nodeDataArray, linkDataArray } = this.diagram.model as any
-        for (let i = 0; i < nodeDataArray.length; i++) {
-            data.push({ tag: i + 1, type: nodeDataArray[i].category, text: nodeDataArray[i].text, next: -1 })
-            inverseMap[nodeDataArray[i].key] = i + 1
-        }
+/*        let inverseMap: {[key: number]: number} = {}
+        let data = [] as INode[]
+        const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
+        nodeDataArray.forEach((item: any, index: number) => {
+            inverseMap[item.key] = index + 1
+            let node = { tag: index + 1, type: item.category, text: item.text, next: -1 } as INode
+            if (item.category === 'SELECT') {
+                for (let c of item.choices) {
+                    if (c.id === 'B') continue
+                    node.choices.push({ tag: c.id, text: c.text, next: -1 })
+                }
+            }
+            data.push(node)
+        })
         for (let e of linkDataArray) {
-            data[inverseMap[e.from] - 1].next = inverseMap[e.to]
+            let u = inverseMap[e.from], v = inverseMap[e.to]
+            if (e.fromPort === 'B') {
+                data[u - 1].next = v
+                if (data[u - 1].type === 'SELECT')
+                    data[u - 1].default_jump = true
+            } else {
+                data[u - 1].choices[Number(e.fromPort) - 1].next = v
+            }
         }
         console.log('link:', linkDataArray);
         if (this.judge(data)) {
@@ -394,7 +401,7 @@ export default class InstancePageClass extends Vue {
             this.diagram.isModified = false
         } else {
             errorMessage('表单逻辑错误，保存失败！')
-        }
+        }*/
     }
 }
 </script>
