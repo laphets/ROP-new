@@ -64,6 +64,8 @@ import { successMessage, errorMessage } from '@/utils/message';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 let $ = go.GraphObject.make
+const typeMap: {[key: string]: string} = { 'TEXT': '简答题', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '上传文件', 'BOX': 'BOX', 'SELECT': '选择题' }
+const nxt = { id: 'B', 'text': '默认跳转' }
 @Component
 export default class InstancePageClass extends Vue {
             
@@ -101,11 +103,20 @@ export default class InstancePageClass extends Vue {
     generateModel(data: INode[]) {
         let model = this.createEmptyModel()
         let NArray = [], LArray = []
-        for (let node of data) {
-            NArray.push({ key: node.tag, category: node.type, text: node.text })
-            if (node.next !== -1) {
-                LArray.push({ from: node.tag, to: node.next, fromPort: 'R', toPort: 'L'/* temp */ })
+        for (let item of data) {
+            let node = { key: item.tag, category: item.type, text: item.text, choices: [nxt] as object[] }
+            if (item.next !== -1) {
+                LArray.push({ from: item.tag, to: item.next, fromPort: 'B', toPort: 'T' })
             }
+            if (item.choices) {
+                for (let c of item.choices) {
+                    node.choices.push({ id: c.tag, text: c.text })
+                    if (c.next !== -1) {
+                        LArray.push({ from: item.tag, to: c.next, fromPort: c.tag, toPort: 'T' })
+                    }
+                }
+            }
+            NArray.push(node)
         }
         model.nodeDataArray = NArray
         model.linkDataArray = LArray
@@ -182,7 +193,14 @@ export default class InstancePageClass extends Vue {
 
         const nodeStyle = [
             new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
-            { locationSpot: go.Spot.Center }
+            {
+                stretch: go.GraphObject.Fill,
+                selectionAdorned: false,
+                isShadowed: true,
+                shadowBlur: 6,
+                shadowColor: 'rgba(0, 0, 0, .12)',
+                shadowOffset: new go.Point(0, 0)
+            }
         ]
 
         const makePort = (name: string, align: go.Spot, spot: go.Spot, output: boolean, input: boolean) => {
@@ -209,35 +227,81 @@ export default class InstancePageClass extends Vue {
             })
         }
 
-        const textStyle = {
-            font: "bold 11pt Helvetica, Arial, sans-serif",
-            stroke: "whitesmoke"
-        }
+        const fontFamily = 'Microsoft YaHei, PingFang SC, Helvetica Neue, Helvetica, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif'
 
-        const createNode = (shape: string) =>
-            $(go.Node, 'Table', nodeStyle, 
-                $(go.Panel, 'Auto', 
-                    $(go.Shape, shape,
-                        { fill: '#00A9C9', strokeWidth: 0 },
-                        new go.Binding('figure', 'figure')),
-                    $(go.TextBlock, textStyle, {
-                        margin: 8,
-                        maxSize: new go.Size(160, NaN),
+        const addNode = (type: string) => diagram.nodeTemplateMap.add(type, 
+            $(go.Node, 'Auto', nodeStyle,
+                $(go.Shape, 'RoundedRectangle', { fill: '#ffe', stroke: null }),
+                $(go.Panel, 'Table', { minSize: new go.Size(60, 30), margin: new go.Margin(0, 6, 6, 6) },
+                    $(go.RowColumnDefinition, {
+                        column: 0,
+                        stretch: go.GraphObject.Horizontal,
+                        alignment: go.Spot.Center
+                    }),
+                    $(go.TextBlock, {
+                        row: 0, column: 0,
+                        font: `14px ${fontFamily}`,
+                        stroke: '#333',
+                        editable: false,
+                        margin: new go.Margin(10, 0, 0, 0),
                         wrap: go.TextBlock.WrapFit,
-                        editable: true
-                    },
-                    new go.Binding('text').makeTwoWay())
+                        alignment: go.Spot.TopCenter,
+                        text: typeMap[type]
+                    }),
+                    $(go. TextBlock, {
+                        row: 1, column: 0,
+                        font: `12px ${fontFamily}`,
+                        stroke: '#333',
+                        margin: new go.Margin(5, 0),
+                        editable: true,
+                        alignment: go.Spot.TopLeft,
+                        maxSize: new go.Size(160, NaN),
+                        text: '请输入问题'
+                    }, new go.Binding('text', 'text').makeTwoWay()),
+                    $(go.Panel, 'Horizontal', { alignment: go.Spot.BottomCenter },
+                        new go.Binding('itemArray', 'choices'),
+                        {
+                            row: 2, column: 0,
+                            itemTemplate: $(go.Panel, 'Auto', {
+                                    fromSpot: go.Spot.Bottom,
+                                    toSpot: go.Spot.Bottom,
+                                    fromLinkable: true,
+                                    toLinkable: false,
+                                    fromMaxLinks: 1,
+                                    cursor: 'pointer',
+                                    margin: new go.Margin(0, 3),
+                                    alignment: go.Spot.Center
+                                },
+                                new go.Binding('portId', 'id', v => v.toString()),
+                                $(go.Shape, 'RoundedRectangle', {
+                                    stroke: null,
+                                    strokeWidth: 0,
+                                    toMaxLinks: 1,
+                                    fill: '#c3edff'
+                                }, new go.Binding('fill', 'id', v => v === 'B' ? '#c3edff' : '#b8f5db')),
+                                $(go.TextBlock, {
+                                        font: `12px ${fontFamily}`,
+                                        stroke: '#028bc4',
+                                        textAlign: 'center',
+                                        margin: new go.Margin(3, 5)
+                                    },
+                                    new go.Binding('text', 'text'),
+                                    new go.Binding('stroke', 'id', v => v === 'B' ? '#028bc4' : '#00a35c')
+                                )
+                            )
+                        }
+                    )
                 ),
-                makePort('L', go.Spot.Left, go.Spot.Left, false, true),
-                makePort('R', go.Spot.Right, go.Spot.Right, true, false)
+                makePort('T', go.Spot.Top, go.Spot.Top, false, true)
             )
+        )
 
-        diagram.nodeTemplateMap.add('TEXT', createNode('RoundedRectangle'))
-        diagram.nodeTemplateMap.add('TEXTAREA', createNode('Rectangle'))
-        diagram.nodeTemplateMap.add('INPUT', createNode('Rectangle'))
-        diagram.nodeTemplateMap.add('UPLOAD', createNode('Ellipse'))
-        diagram.nodeTemplateMap.add('BOX', createNode('Diamond'))
-        diagram.nodeTemplateMap.add('SELECT', createNode('Rectangle'))
+        addNode('TEXT')
+        addNode('TEXTAREA')
+        addNode('INPUT')
+        addNode('UPLOAD')
+        addNode('BOX')
+        addNode('SELECT')
 
         diagram.linkTemplate =
             $(go.Link, {
@@ -280,12 +344,12 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', text: '简答题' },
-                    { category: 'TEXTAREA', text: '论述题' },
-                    { category: 'INPUT', text: '输入框' },
-                    { category: 'UPLOAD', text: '文件上传' },
-                    { category: 'BOX', text: 'BOX' },
-                    { category: 'SELECT', text: '选择题' },
+                    { category: 'TEXT', choices: [nxt] },
+                    { category: 'TEXTAREA', choices: [nxt] },
+                    { category: 'INPUT', choices: [nxt] },
+                    { category: 'UPLOAD', choices: [nxt] },
+                    { category: 'BOX', choices: [nxt] },
+                    { category: 'SELECT', choices: [ nxt, { id: 1, text: 'A'}, { id: 2, text: 'B'}, { id: 3, text: 'C'}, { id: 4, text: 'D'} ] }
                 ])
             }
         )
@@ -306,15 +370,29 @@ export default class InstancePageClass extends Vue {
     }
 
     handleSave() {
-        let inverseMap: {[key: number]: number} = {}
-        let data = []
-        const { nodeDataArray, linkDataArray } = this.diagram.model as any
-        for (let i = 0; i < nodeDataArray.length; i++) {
-            data.push({ tag: i + 1, type: nodeDataArray[i].category, text: nodeDataArray[i].text, next: -1})
-            inverseMap[nodeDataArray[i].key] = i + 1
-        }
+/*        let inverseMap: {[key: number]: number} = {}
+        let data = [] as INode[]
+        const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
+        nodeDataArray.forEach((item: any, index: number) => {
+            inverseMap[item.key] = index + 1
+            let node = { tag: index + 1, type: item.category, text: item.text, next: -1 } as INode
+            if (item.category === 'SELECT') {
+                for (let c of item.choices) {
+                    if (c.id === 'B') continue
+                    node.choices.push({ tag: c.id, text: c.text, next: -1 })
+                }
+            }
+            data.push(node)
+        })
         for (let e of linkDataArray) {
-            data[inverseMap[e.from] - 1].next = inverseMap[e.to]
+            let u = inverseMap[e.from], v = inverseMap[e.to]
+            if (e.fromPort === 'B') {
+                data[u - 1].next = v
+                if (data[u - 1].type === 'SELECT')
+                    data[u - 1].default_jump = true
+            } else {
+                data[u - 1].choices[Number(e.fromPort) - 1].next = v
+            }
         }
         console.log('link:', linkDataArray);
         if (this.judge(data)) {
@@ -323,7 +401,7 @@ export default class InstancePageClass extends Vue {
             this.diagram.isModified = false
         } else {
             errorMessage('表单逻辑错误，保存失败！')
-        }
+        }*/
     }
 }
 </script>
@@ -357,6 +435,7 @@ export default class InstancePageClass extends Vue {
             }
         }
         .editor-container {
+            // background-color: #f0f2f5;
             flex: 1;
         }
     }
