@@ -184,7 +184,10 @@ export default class InstancePageClass extends Vue {
             'allowDrop': true,
             'scrollsPageOnFocus': false,
             'undoManager.isEnabled': true,
-            'grid.visible': false
+            'grid.visible': false,
+            layout: $(go.TreeLayout, {
+                angle: 90
+            })
         })
 
         diagram.addDiagramListener('Modified', (e: any) => {
@@ -370,38 +373,38 @@ export default class InstancePageClass extends Vue {
     }
 
     handleSave() {
-/*        let inverseMap: {[key: number]: number} = {}
-        let data = [] as INode[]
-        const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
-        nodeDataArray.forEach((item: any, index: number) => {
-            inverseMap[item.key] = index + 1
-            let node = { tag: index + 1, type: item.category, text: item.text, next: -1 } as INode
-            if (item.category === 'SELECT') {
-                for (let c of item.choices) {
-                    if (c.id === 'B') continue
-                    node.choices.push({ tag: c.id, text: c.text, next: -1 })
-                }
-            }
-            data.push(node)
-        })
-        for (let e of linkDataArray) {
-            let u = inverseMap[e.from], v = inverseMap[e.to]
-            if (e.fromPort === 'B') {
-                data[u - 1].next = v
-                if (data[u - 1].type === 'SELECT')
-                    data[u - 1].default_jump = true
-            } else {
-                data[u - 1].choices[Number(e.fromPort) - 1].next = v
-            }
-        }
-        console.log('link:', linkDataArray);
-        if (this.judge(data)) {
-            successMessage('保存成功！')
-            this.form.data = data
-            this.diagram.isModified = false
-        } else {
-            errorMessage('表单逻辑错误，保存失败！')
-        }*/
+        // let inverseMap: {[key: number]: number} = {}
+        // let data = [] as INode[]
+        // const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
+        // nodeDataArray.forEach((item: any, index: number) => {
+        //     inverseMap[item.key] = index + 1
+        //     let node = { tag: index + 1, type: item.category, text: item.text, next: -1 } as INode
+        //     if (item.category === 'SELECT') {
+        //         for (let c of item.choices) {
+        //             if (c.id === 'B') continue
+        //             node.choices.push({ tag: c.id, text: c.text, next: -1 })
+        //         }
+        //     }
+        //     data.push(node)
+        // })
+        // for (let e of linkDataArray as any) {
+        //     let u = inverseMap[e.from], v = inverseMap[e.to]
+        //     if (e.fromPort === 'B') {
+        //         data[u - 1].next = v
+        //         if (data[u - 1].type === 'SELECT')
+        //             data[u - 1].default_jump = true
+        //     } else {
+        //         data[u - 1].choices[Number(e.fromPort) - 1].next = v
+        //     }
+        // }
+        // console.log('link:', linkDataArray);
+        // if (this.judge(data)) {
+        //     successMessage('保存成功！')
+        //     this.form.data = data
+        //     this.diagram.isModified = false
+        // } else {
+        //     errorMessage('表单逻辑错误，保存失败！')
+        // }
     }
 }
 </script>
