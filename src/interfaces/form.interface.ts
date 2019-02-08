@@ -5,9 +5,9 @@ export interface IChoice {
 }
 
 export interface INode {
-    tag?: number;
-    text?: string;
-    type?: string; // TODO
+    tag: number;
+    text: string;
+    type: string; // TODO
     spec?: string; // TODO
     re?: string;
     required?: boolean;
