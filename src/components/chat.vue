@@ -7,6 +7,11 @@
         @close="onClose"
         :visible="innerVisible"
         >
+            <div class="message-container">
+                <div v-for="(item, index) in messageList" :key="index">
+                    {{item}}
+                </div>
+            </div>
             <div class="sending-container">
                 <a-input v-model="input" @keyup.enter="sendMessage()"></a-input>
                 <a-button @click="sendMessage()">发送</a-button>
@@ -51,16 +56,18 @@ export default class ChatClass extends Vue {
         if (oldVal && !val) {
             // Close Chat
             console.log('Close Chat')
+            this.closeSocket()
             return
         }
     }
 
-    messageList = []
+    messageList = [] as string[]
     input = ""
 
     sendMessage() {
         this.socket.emit('new message', this.input)
-        console.log(this.input)
+        // console.log(this.input)
+        this.messageList.push(`You said: ${this.input}`)
     }
 
 
@@ -78,15 +85,27 @@ export default class ChatClass extends Vue {
         })
 
         this.socket.emit('add user')
-
-        this.socket.on('user joined', (data: any) => {
-            console.log(data)
+        this.socket.on('login', (data: any) => {
+            this.messageList.push(`You ${data.ZJUid} logined ${data.interviewId}, now there are ${data.numUsers} users.`)
+            // console.log(data)
         })
+
+        interface UserJoin {
+            ZJUid: string;
+            numUsers: number;
+        }
+        this.socket.on('user joined', (data: UserJoin) => {
+            this.messageList.push(`${data.ZJUid} joined, now there are ${data.numUsers} users.`)
+            // console.log(data)
+        })
+
         this.socket.on('user left', (data: any) => {
-            console.log(data)
+            this.messageList.push(`${data.ZJUid} lefrt, now there are ${data.numUsers} users.`)
+            // console.log(data)
         })
         this.socket.on('new message', (data: any) => {
-            console.log('11' + data)
+            this.messageList.push(`${data.ZJUid} said: ${data.message}`)
+            // console.log('11' + data)
         })
         this.socket.on('disconnected', () => {
             console.log('disconnected')
@@ -100,8 +119,14 @@ export default class ChatClass extends Vue {
         });
     }
 
+    closeSocket() {
+        this.socket.close()
+        this.socket = {} as SocketIOClient.Socket
+    }
+
     onClose() {
         this.innerVisible = false;
+
     }
 
 }
@@ -111,5 +136,7 @@ export default class ChatClass extends Vue {
 .sending-container {
     display: flex;
     justify-content: space-between;
+    position: absolute;
+    bottom: 20px;
 }
 </style>
