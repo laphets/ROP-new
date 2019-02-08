@@ -1,7 +1,9 @@
 <template>
     <div class="index-page">
         <div class="events-card">
-            <a-calendar>
+          <a-button @click="openChat()">Open</a-button>
+            <ChatComponent :visible.sync="visible" :interviewId="roomId"></ChatComponent>
+            <!-- <a-calendar>
                 <ul class="events" slot="dateCellRender" slot-scope="value">
                 <li v-for="item in getListData(value)" :key="item.content">
                     <a-badge :status="item.type" :text="item.content" />
@@ -13,7 +15,7 @@
                     <span>Backlog number</span>
                 </div>
                 </template>
-            </a-calendar>
+            </a-calendar> -->
         </div>
 
     </div>
@@ -21,12 +23,23 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import ChatComponent from '@/components/chat.vue'
 
-@Component
+@Component({
+  components: {
+    ChatComponent
+  }
+})
 export default class IndexPageClass extends Vue {
     created() {
         console.log('233')
     }
+
+    openChat() {
+      this.visible = true;
+    }
+    visible = false;
+    roomId = 0;
 
     getListData(value: any) {
       let listData;
