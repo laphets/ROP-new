@@ -58,8 +58,8 @@
 <script lang="ts">
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import go, { DraggingTool, Diagram, GraphLinksModel } from 'fuckgojs';
-import { RawForm, IForm, INode } from '@/interfaces/form.interface';
-import { getFormList } from '@/api/form';
+import { RawForm, IForm, INode, IChoice } from '@/interfaces/form.interface';
+import { getFormList, updateForm } from '@/api/form';
 import { successMessage, errorMessage } from '@/utils/message';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -76,17 +76,17 @@ export default class InstancePageClass extends Vue {
     buttonDisabled = true
     selectedID = 0;
 
-    async created() {
+    async getData() {
         const { data } = (await getFormList()).data
         this.formList = data
+        this.renderList = []
         data.forEach((item: RawForm)=> {
             this.renderList.push({ name: item.name, ID: item.ID, UpdatedAt: item.UpdatedAt })
         })
-        // this.$nextTick(() => {
-        //     // this.selectedID = 0;
-        // })
-        // this.renderData = data
-        // console.log('data', this.renderData);
+    }
+
+    async created() {
+        await this.getData()
     }
 
     parse_time(time: any) {
@@ -372,39 +372,45 @@ export default class InstancePageClass extends Vue {
         this.loadForm()
     }
 
-    handleSave() {
-        // let inverseMap: {[key: number]: number} = {}
-        // let data = [] as INode[]
-        // const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
-        // nodeDataArray.forEach((item: any, index: number) => {
-        //     inverseMap[item.key] = index + 1
-        //     let node = { tag: index + 1, type: item.category, text: item.text, next: -1 } as INode
-        //     if (item.category === 'SELECT') {
-        //         for (let c of item.choices) {
-        //             if (c.id === 'B') continue
-        //             node.choices.push({ tag: c.id, text: c.text, next: -1 })
-        //         }
-        //     }
-        //     data.push(node)
-        // })
-        // for (let e of linkDataArray as any) {
-        //     let u = inverseMap[e.from], v = inverseMap[e.to]
-        //     if (e.fromPort === 'B') {
-        //         data[u - 1].next = v
-        //         if (data[u - 1].type === 'SELECT')
-        //             data[u - 1].default_jump = true
-        //     } else {
-        //         data[u - 1].choices[Number(e.fromPort) - 1].next = v
-        //     }
-        // }
-        // console.log('link:', linkDataArray);
-        // if (this.judge(data)) {
-        //     successMessage('保存成功！')
-        //     this.form.data = data
-        //     this.diagram.isModified = false
-        // } else {
-        //     errorMessage('表单逻辑错误，保存失败！')
-        // }
+    async handleSave() {
+        let inverseMap: {[key: number]: number} = {}
+        let data = [] as INode[]
+        const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
+        nodeDataArray.forEach((item: any, index: number) => {
+            inverseMap[item.key] = index + 1
+            if (item.category === 'SELECT') {
+                let choices = [] as IChoice[]
+                for (let c of item.choices) {
+                    if (c.id === 'B') continue
+                    choices.push({ tag: c.id, text: c.text, next: -1 })
+                }
+                data.push({ tag: index + 1, type: item.category, text: item.text, next: -1, choices: choices })
+            } else {
+                data.push({ tag: index + 1, type: item.category, text: item.text, next: -1 })
+            }
+        })
+        for (let e of linkDataArray as any) {
+            const u = inverseMap[e.from], v = inverseMap[e.to]
+            const node = data[u - 1] as any
+            if (e.fromPort === 'B') {
+                node.next = v
+                if (node.type === 'SELECT')
+                    node.default_jump = true
+            } else {
+                const index = Number(e.fromPort) - 1
+                node.choices[index].next = v
+            }
+        }
+        console.log('data:', data);
+        if (this.judge(data) && this.selectedID) {
+            successMessage('保存成功！')
+            this.form.data = data
+            await updateForm(this.selectedID, { name: this.form.name, data: JSON.stringify(this.form.data) })
+            await this.getData()
+            this.diagram.isModified = false
+        } else {
+            errorMessage('表单逻辑错误，保存失败！')
+        }
     }
 }
 </script>
