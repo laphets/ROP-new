@@ -37,7 +37,7 @@
                     <ul class="ant-card-actions" slot="actions">
                         <li style="width: 33.3333%;">面试管理</li>
                         <li style="width: 33.3333%;">面试者查看</li>
-                        <li style="width: 33.3333%;">面试记录</li>
+                        <li @click="openChat(item)" style="width: 33.3333%;">面试交流</li>
                     </ul>
 
                     </div>
@@ -57,6 +57,7 @@
             </a-table>
         </div>
 
+        <ChatComponent :visible.sync="chatVisible" :interviewId="interviewId"></ChatComponent>
 
         <a-modal
         :title="`${modal_content.name}的个人信息`"
@@ -87,7 +88,13 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { successMessage } from '@/utils/message';
 
-@Component
+import ChatComponent from '@/components/chat.vue'
+
+@Component({
+    components: {
+        ChatComponent
+    }
+})
 export default class FirstClass extends Vue {
     @Prop({default: 'card'}) showmode!: string
     get showMode() {
@@ -161,6 +168,12 @@ export default class FirstClass extends Vue {
         // })
     }
 
+    chatVisible = false;
+    interviewId = 0;
+    openChat(interview: any) {
+        console.log(interview)
+    }
+
     reject(record: any) {
         intentAPI.reject(record.intent_id).then(res => {
             console.log(res)
@@ -171,6 +184,11 @@ export default class FirstClass extends Vue {
 </script>
 
 <style lang="less" scoped>
+.ant-card-actions {
+    li {
+        cursor: pointer !important;
+    }
+}
 .error {
     color: red;
 }

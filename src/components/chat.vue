@@ -37,6 +37,7 @@ export default class ChatClass extends Vue {
     @Prop(Number) interviewId !: number
     @Prop(Boolean) visible !: boolean
     @Getter('token') token!: string;
+    @Getter('ZJUid') ZJUid!: string;
 
     get innerVisible(): boolean {
         return this.visible
@@ -104,7 +105,7 @@ export default class ChatClass extends Vue {
             // console.log(data)
         })
         this.socket.on('new message', (data: any) => {
-            this.messageList.push(`${data.ZJUid} said: ${data.message}`)
+            this.messageList.push(`${data.ZJUid === this.ZJUid ? 'You' : data.ZJUid} said: ${data.message}`)
             // console.log('11' + data)
         })
         this.socket.on('disconnected', () => {
