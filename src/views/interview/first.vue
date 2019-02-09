@@ -172,6 +172,8 @@ export default class FirstClass extends Vue {
     interviewId = 0;
     openChat(interview: any) {
         console.log(interview)
+        this.interviewId = interview.ID;
+        this.chatVisible = true;
     }
 
     reject(record: any) {
