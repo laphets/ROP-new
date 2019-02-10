@@ -31,6 +31,7 @@ import { Getter } from 'vuex-class'
 import { setTimeout } from 'timers';
 
 import io from 'socket.io-client'
+import { getMessageHistory } from '@/api/socket';
 
 @Component
 export default class ChatClass extends Vue {
@@ -69,11 +70,17 @@ export default class ChatClass extends Vue {
         this.socket.emit('new message', this.input)
         // console.log(this.input)
         this.messageList.push(`You said: ${this.input}`)
+        this.input = ""
     }
 
 
     socket = {} as SocketIOClient.Socket;
-    initSocket(interviewId: number) {
+    async initSocket(interviewId: number) {
+        const { data: historyList } = (await getMessageHistory(interviewId)).data
+        historyList.forEach((item: any) => {
+            this.messageList.push(`${item.sender === this.ZJUid ? 'You' : item.sender} said: ${item.message}`)
+        })
+        console.log(historyList)
         this.socket = io({
             transportOptions: {
                 polling: {
@@ -101,7 +108,7 @@ export default class ChatClass extends Vue {
         })
 
         this.socket.on('user left', (data: any) => {
-            this.messageList.push(`${data.ZJUid} lefrt, now there are ${data.numUsers} users.`)
+            this.messageList.push(`${data.ZJUid} left, now there are ${data.numUsers} users.`)
             // console.log(data)
         })
         this.socket.on('new message', (data: any) => {
@@ -123,6 +130,7 @@ export default class ChatClass extends Vue {
     closeSocket() {
         this.socket.close()
         this.socket = {} as SocketIOClient.Socket
+        this.messageList = []
     }
 
     onClose() {

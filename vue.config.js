@@ -20,7 +20,7 @@ module.exports = {
         }
       },
       '/socket.io': {
-        target: 'http://127.0.0.1:8000',
+        target: 'https://rop.zjuqsc.com/',
         ws: true,
         // pathRewrite: {
         //   '^/socket': '/'
@@ -28,7 +28,7 @@ module.exports = {
       },
       '/socket': {
         // target: 'https://rop.zjuqsc.com/api',
-        target: 'http://127.0.0.1:8000',
+        target: 'https://rop.zjuqsc.com/socket',
         pathRewrite: {
           '^/socket': '/'
         }
