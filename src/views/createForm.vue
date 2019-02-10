@@ -39,11 +39,11 @@
         <div class="gojs-container">
             <div class="btn-container">
                 <div class="left">
-                    <a-button :type="'primary'">新建表单</a-button>
+                    <a-button @click="handleCreate" :type="'primary'">新建表单</a-button>
                 </div>
                 <div class="right">
                     <a-button @click="handleClear">全部清空</a-button>
-                    <a-button @click="handleUndo">撤销操作</a-button>
+                    <a-button :disabled="! selectedID" @click="handleUndo">撤销操作</a-button>
                     <a-button :disabled="buttonDisabled" @click="handleSave" :type="'primary'">保存</a-button>
                 </div>
             </div>
@@ -65,7 +65,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 let $ = go.GraphObject.make
 const typeMap: {[key: string]: string} = { 'TEXT': '简答题', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '上传文件', 'BOX': 'BOX', 'SELECT': '选择题' }
-const nxt = { id: 'B', 'text': '默认跳转' }
+const defaultPort = { id: 'B', 'text': '默认跳转' }
 @Component
 export default class InstancePageClass extends Vue {
             
@@ -100,11 +100,78 @@ export default class InstancePageClass extends Vue {
         return model
     }
 
+    judgeModel() {
+        let inverseMap: {[key: number]: number} = {}
+        const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
+        const n = nodeDataArray.length
+        let inDegree: number[] = new Array<number>(n)
+        let adjEdge: number[][] = new Array<Array<number>>(n)
+        let queue: number[] = []
+        nodeDataArray.forEach((item: any, index: number) => {
+            inverseMap[item.key] = index
+            inDegree[index] = 0
+            adjEdge[index] = []
+        })
+        for (let e of linkDataArray as any) {
+            const u = inverseMap[e.from], v = inverseMap[e.to]
+            inDegree[v]++
+            adjEdge[u].push(v)
+        }
+        inDegree.forEach((degree: number, vertex: number) => {
+            if (degree === 0) queue.push(vertex)
+        })
+        if (queue.length > 1) return false
+        while (queue.length) {
+            let u = queue[0]
+            queue.shift()
+            for (let v of adjEdge[u]) {
+                if (--inDegree[v] === 0) {
+                    queue.push(v)
+                }
+            }
+        }
+        for (let degree of inDegree)
+            if (degree > 0) return false
+        return true
+    }
+
+    generateForm() {
+        let inverseMap: {[key: number]: number} = {}
+        let data = [] as INode[]
+        const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
+        nodeDataArray.forEach((item: any, index: number) => {
+            inverseMap[item.key] = index + 1
+            if (item.category === 'SELECT') {
+                let choices = [] as IChoice[]
+                for (let c of item.choices) {
+                    if (c.id === 'B') continue
+                    choices.push({ tag: c.id, text: c.text, next: -1 })
+                }
+                data.push({ tag: index + 1, type: item.category, text: item.text, next: -1, choices: choices })
+            } else {
+                data.push({ tag: index + 1, type: item.category, text: item.text, next: -1 })
+            }
+        })
+        for (let e of linkDataArray as any) {
+            const u = inverseMap[e.from], v = inverseMap[e.to]
+            const node = data[u - 1] as any
+            if (e.fromPort === 'B') {
+                node.next = v
+                if (node.type === 'SELECT')
+                    node.default_jump = true
+            } else {
+                const index = Number(e.fromPort) - 1
+                node.choices[index].next = v
+            }
+        }
+        return data
+    }
+
     generateModel(data: INode[]) {
         let model = this.createEmptyModel()
         let NArray = [], LArray = []
         for (let item of data) {
-            let node = { key: item.tag, category: item.type, text: item.text, choices: [nxt] as object[] }
+            let node = { key: item.tag, category: item.type, text: item.text, choices: [defaultPort] as object[] }
             if (item.next !== -1) {
                 LArray.push({ from: item.tag, to: item.next, fromPort: 'B', toPort: 'T' })
             }
@@ -347,21 +414,17 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', choices: [nxt] },
-                    { category: 'TEXTAREA', choices: [nxt] },
-                    { category: 'INPUT', choices: [nxt] },
-                    { category: 'UPLOAD', choices: [nxt] },
-                    { category: 'BOX', choices: [nxt] },
-                    { category: 'SELECT', choices: [ nxt, { id: 1, text: 'A'}, { id: 2, text: 'B'}, { id: 3, text: 'C'}, { id: 4, text: 'D'} ] }
+                    { category: 'TEXT', choices: [defaultPort] },
+                    { category: 'TEXTAREA', choices: [defaultPort] },
+                    { category: 'INPUT', choices: [defaultPort] },
+                    { category: 'UPLOAD', choices: [defaultPort] },
+                    { category: 'BOX', choices: [defaultPort] },
+                    { category: 'SELECT', choices: [ defaultPort, { id: 1, text: 'A'}, { id: 2, text: 'B'}, { id: 3, text: 'C'}, { id: 4, text: 'D'} ] }
                 ])
             }
         )
 
         this.diagram = diagram
-    }
-
-    judge(data: any[]) {
-        return true
     }
 
     handleClear() {
@@ -372,44 +435,23 @@ export default class InstancePageClass extends Vue {
         this.loadForm()
     }
 
+    handleCreate() {
+        
+    }
+
     async handleSave() {
-        let inverseMap: {[key: number]: number} = {}
-        let data = [] as INode[]
-        const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
-        nodeDataArray.forEach((item: any, index: number) => {
-            inverseMap[item.key] = index + 1
-            if (item.category === 'SELECT') {
-                let choices = [] as IChoice[]
-                for (let c of item.choices) {
-                    if (c.id === 'B') continue
-                    choices.push({ tag: c.id, text: c.text, next: -1 })
-                }
-                data.push({ tag: index + 1, type: item.category, text: item.text, next: -1, choices: choices })
-            } else {
-                data.push({ tag: index + 1, type: item.category, text: item.text, next: -1 })
+        if (this.judgeModel()) {
+            try {
+                this.form.data = this.generateForm()
+                await updateForm(this.selectedID, { name: this.form.name, data: JSON.stringify(this.form.data) })
+                await this.getData()
+                this.diagram.isModified = false
+                successMessage('保存成功')
+            } catch (err) {
+                errorMessage('保存失败')
             }
-        })
-        for (let e of linkDataArray as any) {
-            const u = inverseMap[e.from], v = inverseMap[e.to]
-            const node = data[u - 1] as any
-            if (e.fromPort === 'B') {
-                node.next = v
-                if (node.type === 'SELECT')
-                    node.default_jump = true
-            } else {
-                const index = Number(e.fromPort) - 1
-                node.choices[index].next = v
-            }
-        }
-        console.log('data:', data);
-        if (this.judge(data) && this.selectedID) {
-            successMessage('保存成功！')
-            this.form.data = data
-            await updateForm(this.selectedID, { name: this.form.name, data: JSON.stringify(this.form.data) })
-            await this.getData()
-            this.diagram.isModified = false
         } else {
-            errorMessage('表单逻辑错误，保存失败！')
+            errorMessage('表单逻辑有误')
         }
     }
 }
@@ -444,7 +486,6 @@ export default class InstancePageClass extends Vue {
             }
         }
         .editor-container {
-            // background-color: #f0f2f5;
             flex: 1;
         }
     }
