@@ -25,7 +25,14 @@ module.exports = {
         // pathRewrite: {
         //   '^/socket': '/'
         // }
-      }
+      },
+      '/socket': {
+        // target: 'https://rop.zjuqsc.com/api',
+        target: 'http://127.0.0.1:8000',
+        pathRewrite: {
+          '^/socket': '/'
+        }
+      },
     }
   }
 }
