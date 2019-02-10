@@ -1,27 +1,5 @@
 <template>
-    <div class="page">
-        <div class="page-container">
-            <div class="opt-line">
-                <div class="left-opt">
-                    <div v-for="(item, index) in viewType" :key="index" @click="toogleView(index)" class="inline" :class="curView == index? 'select' : 'unselect'">
-                        {{item}}
-                    </div>
-                </div>
-                <div class="right-opt">
-                    <a-button :disabled="curView == 0" @click="mode='card'" :type="mode == 'card' ? 'primary' : 'default'">卡片模式</a-button>
-                    <a-button :disabled="curView == 0" @click="mode='list'" :type="mode == 'card' ? 'default' : 'primary'">列表模式</a-button>
-                    <a-divider type="vertical" />
-                    <a-button @click="showCreateGroup()" type="dashed">新建面试分组</a-button>
-                </div>
-            </div>
- 
-            <div>
-                <public-sea v-if="curView == 0" :showmode.sync="mode"></public-sea>
-                <first-interview v-if="curView == 1" :showmode.sync="mode"></first-interview>
-            </div>
-        </div>
-
-<!-- Create new -->
+    <div>
         <a-modal
         style="top: 1px;"
         title="新建面试分组"
@@ -167,128 +145,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import firstInterview from './first.vue'
-import publicSea from './publicsea.vue'
+import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { getDepartmentList } from '@/api/association'
-import { createInterview } from '@/api/interview'
-
-import moment from 'moment';
-import 'moment/locale/zh-cn';
-
-import { successMessage } from '@/utils/message';
-
-@Component({
-    components: {
-        firstInterview,
-        publicSea
-    }
-})
-export default class InterviewPageClass extends Vue {
-    moment = moment
-    mode = "card"
-    curView = 0
-    
-    department = '' as string | undefined
-
-    viewType = [
-        '公海',
-        '一面',
-        '二面'
-    ]
-    
-    created() {
-        this.department = this.$route.name
-    }
-
-    toogleView(target: number) {
-        this.curView = target
-    }
-
-    departmentList = []
-
-    createGroupVisable = false
-    async showCreateGroup() {
-        this.departmentList = (((await getDepartmentList()).data).data).department
-        this.createGroupVisable = true
-    }
-
-    prase_time(time: string) {
-        return moment(new Date(time)).format('LLL')
-    }
-    parse_status(status: string) {
-        if (status === 'cur') {
-            return '进行中'
-        } else if (status === 'before') {
-            return '尚未开始'
-        } else {
-            return '已结束'
-        }
-    }
+@Component
+export default class NewInterviewComponent extends Vue {
+    @Prop(Boolean) visible !: boolean
 
     
-
-    submitLoading = false
-    handleCreateSubmit(e: any) {
-        (this as any).form.validateFields(async (err: boolean, values: any) => {
-            if (!err) {
-                this.submitLoading = true;
-                const time = values.time.map((item: any) => item.format())
-                try {
-                    await createInterview({
-                        ...values,
-                        start_time: time[0],
-                        end_time: time[1],
-                    })
-                    this.submitLoading = false
-                    this.createGroupVisable = false
-                    successMessage('面试分组创建成功~')
-                } catch (error) {
-                    this.submitLoading = false;
-                }
-            }
-        })
-    }
 }
+
 </script>
 
 <style lang="less" scoped>
-.page {
-    height: calc(100vh - 70px);
-    padding: 20px;
-    .page-container {
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        background-color: #fff;
-        box-shadow: 0 2px 4px rgba(0,0,0,.12), 0 0 6px rgba(0,0,0,.04);
-        border-radius: 4px;
-        padding: 28px 36px 10px 36px;
-    }
-}
 
-.opt-line {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    
-}
-.right-opt {
-    button {
-        margin-left: 10px;
-    }
-}
-.inline {
-    font-size: 18px;
-    display: inline;
-    margin-right: 20px;
-    cursor: pointer;
-}
-.unselect {
-    color: #A7A5A5
-}
-.select {
-    color: #4A90E2
-}
 </style>
