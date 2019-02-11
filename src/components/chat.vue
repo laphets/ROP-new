@@ -1,7 +1,7 @@
 <template>
     <div>
         <a-drawer
-        title="Chat"
+        :title="`#${interviewId} 面试记录`"
         placement="right"
         :closable="false"
         @close="onClose"
