@@ -56,9 +56,7 @@
                     </span>
             </a-table>
         </div>
-
         <ChatComponent :visible.sync="chatVisible" :interviewId="interviewId"></ChatComponent>
-
         <a-modal
         :title="`${modal_content.name}的个人信息`"
         v-model="modalVisable"

@@ -135,7 +135,6 @@ export default class ChatClass extends Vue {
 
     onClose() {
         this.innerVisible = false;
-
     }
 
 }
