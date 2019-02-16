@@ -40,6 +40,24 @@
             <div class="btn-container">
                 <div class="left">
                     <a-button @click="handleCreate" :type="'primary'">新建表单</a-button>
+                    <a-modal
+                    title="新建表单"
+                    v-model="modalVisible"
+                    @ok="handleOk"
+                    @cancel="handleCancel"
+                    >
+                        <a-form :form="form">
+                            <a-form-item label="表单名称">
+                                <a-input
+                                placeholder="请输入表单名称"
+                                v-decorator="[
+                                    'name',
+                                    { rules: [{ required: true, message: '请输入表单名称' }] }
+                                ]"
+                                />
+                            </a-form-item>
+                        </a-form>
+                    </a-modal>
                 </div>
                 <div class="right">
                     <a-button @click="handleClear">全部清空</a-button>
@@ -59,7 +77,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import go, { DraggingTool, Diagram, GraphLinksModel } from 'fuckgojs';
 import { RawForm, IForm, INode, IChoice } from '@/interfaces/form.interface';
-import { getFormList, updateForm } from '@/api/form';
+import { getFormList, updateForm, createForm } from '@/api/form';
 import { successMessage, errorMessage } from '@/utils/message';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -72,9 +90,11 @@ export default class InstancePageClass extends Vue {
     formList = [{ name: '' }] as RawForm[]
     renderList = [] as object[]
     diagram = {} as Diagram
-    form = {} as IForm
+    tempForm = {} as IForm
     buttonDisabled = true
-    selectedID = 0;
+    selectedID = 0
+    modalVisible = false
+    form = {} as object
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -86,6 +106,7 @@ export default class InstancePageClass extends Vue {
     }
 
     async created() {
+        this.form = this.$form.createForm(this)
         await this.getData()
     }
 
@@ -141,15 +162,16 @@ export default class InstancePageClass extends Vue {
         const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
         nodeDataArray.forEach((item: any, index: number) => {
             inverseMap[item.key] = index + 1
+            let node = { tag: index + 1, type: item.category, text: item.next, next: -1 }
             if (item.category === 'SELECT') {
                 let choices = [] as IChoice[]
                 for (let c of item.choices) {
                     if (c.id === 'B') continue
                     choices.push({ tag: c.id, text: c.text, next: -1 })
                 }
-                data.push({ tag: index + 1, type: item.category, text: item.text, next: -1, choices: choices })
+                data.push({ ... node, choices: choices })
             } else {
-                data.push({ tag: index + 1, type: item.category, text: item.text, next: -1 })
+                data.push(node)
             }
         })
         for (let e of linkDataArray as any) {
@@ -200,8 +222,8 @@ export default class InstancePageClass extends Vue {
             }
             return true
         })
-        this.form = { name: selectedForm.name, data: JSON.parse(selectedForm.data) }
-        this.diagram.model = await this.generateModel(this.form.data)
+        this.tempForm = { name: selectedForm.name, data: JSON.parse(selectedForm.data) }
+        this.diagram.model = await this.generateModel(this.tempForm.data)
     }
 
     async togoSelect(ID: number) {
@@ -435,15 +457,35 @@ export default class InstancePageClass extends Vue {
         this.loadForm()
     }
 
+    handleOk() {
+        (this.form as any).validateFields(async (err: boolean, values: any) => {
+            if (! err) {
+                try {
+                    console.log(values)
+                    await createForm({ ...values, data : [] })
+                    await this.getData()
+                    this.modalVisible = false
+                    successMessage('创建成功')
+                } catch(err) {
+                    console.log(err)
+                }
+            }
+        })
+    }
+
+    handleCancel() {
+        this.modalVisible = false
+    }
+
     handleCreate() {
-        
+        this.modalVisible = true
     }
 
     async handleSave() {
         if (this.judgeModel()) {
             try {
-                this.form.data = this.generateForm()
-                await updateForm(this.selectedID, { name: this.form.name, data: JSON.stringify(this.form.data) })
+                this.tempForm.data = this.generateForm()
+                await updateForm(this.selectedID, { name: this.tempForm.name, data: JSON.stringify(this.tempForm.data) })
                 await this.getData()
                 this.diagram.isModified = false
                 successMessage('保存成功')
