@@ -42,9 +42,9 @@
                     <a-button @click="handleCreate" :type="'primary'">新建表单</a-button>
                     <a-modal
                     title="新建表单"
-                    v-model="modalVisible"
-                    @ok="handleOk"
-                    @cancel="handleCancel"
+                    v-model="createModalVisible"
+                    @ok="handleCreateOk"
+                    @cancel="handleCreateCancel"
                     >
                         <a-form :form="form">
                             <a-form-item label="表单名称">
@@ -69,6 +69,25 @@
                 <div id="palette" style="height: 15%;"></div>
                 <div id="diagram" style="height: 85%;"></div>
             </div>
+            <a-modal
+            title="编辑问题"
+            v-model="editModalVisible"
+            @ok="handleEditOk"
+            @cancel="handleEditCancel"
+            >
+                <a-form :form="form">
+                    <a-form-item label="选项个数">
+                        <a-input-number :min="0" :max="26"
+                            v-decorator="[
+                                'choiceCount',
+                                {
+                                    rules: [{ required: true, message: '请输入选项个数' }]
+                                }
+                            ]"
+                        />
+                    </a-form-item>
+                </a-form>
+            </a-modal>
         </div>
     </div>
 </template>
@@ -81,6 +100,7 @@ import { getFormList, updateForm, createForm } from '@/api/form';
 import { successMessage, errorMessage } from '@/utils/message';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import { setTimeout } from 'timers';
 let $ = go.GraphObject.make
 const typeMap: {[key: string]: string} = { 'TEXT': '简答题', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '上传文件', 'BOX': 'BOX', 'SELECT': '选择题' }
 const defaultPort = { id: 'B', 'text': '默认跳转' }
@@ -93,8 +113,10 @@ export default class InstancePageClass extends Vue {
     tempForm = {} as IForm
     buttonDisabled = true
     selectedID = 0
-    modalVisible = false
+    createModalVisible = false
+    editModalVisible = false
     form = {} as object
+    choices = [] as object[]
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -283,6 +305,17 @@ export default class InstancePageClass extends Vue {
             this.buttonDisabled = !diagram.isModified
         })
 
+        diagram.addDiagramListener('ObjectDoubleClicked', async (e: any) => {
+            if (e.subject.panel.data) {
+                (this as any).form.resetFields()
+                this.editModalVisible = true
+                this.choices = e.subject.panel.data.choices
+                await setTimeout(() => {
+                    (this as any).form.setFieldsValue({ choiceCount: this.choices.length - 1 })
+                }, 100)
+            }
+        })
+
         const nodeStyle = [
             new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
             {
@@ -375,7 +408,8 @@ export default class InstancePageClass extends Vue {
                                         font: `12px ${fontFamily}`,
                                         stroke: '#028bc4',
                                         textAlign: 'center',
-                                        margin: new go.Margin(3, 5)
+                                        margin: new go.Margin(3, 5),
+                                        editable: true
                                     },
                                     new go.Binding('text', 'text'),
                                     new go.Binding('stroke', 'id', v => v === 'B' ? '#028bc4' : '#00a35c')
@@ -436,11 +470,11 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', choices: [defaultPort] },
-                    { category: 'TEXTAREA', choices: [defaultPort] },
-                    { category: 'INPUT', choices: [defaultPort] },
-                    { category: 'UPLOAD', choices: [defaultPort] },
-                    { category: 'BOX', choices: [defaultPort] },
+                    // { category: 'TEXT', choices: [defaultPort] },
+                    // { category: 'TEXTAREA', choices: [defaultPort] },
+                    // { category: 'INPUT', choices: [defaultPort] },
+                    // { category: 'UPLOAD', choices: [defaultPort] },
+                    // { category: 'BOX', choices: [defaultPort] },
                     { category: 'SELECT', choices: [ defaultPort, { id: 1, text: 'A'}, { id: 2, text: 'B'}, { id: 3, text: 'C'}, { id: 4, text: 'D'} ] }
                 ])
             }
@@ -457,14 +491,14 @@ export default class InstancePageClass extends Vue {
         this.loadForm()
     }
 
-    handleOk() {
-        (this.form as any).validateFields(async (err: boolean, values: any) => {
+    handleCreateOk() {
+        (this as any).form.validateFields(async (err: boolean, values: any) => {
             if (! err) {
                 try {
                     console.log(values)
                     await createForm({ ...values, data : [] })
                     await this.getData()
-                    this.modalVisible = false
+                    this.createModalVisible = false
                     successMessage('创建成功')
                 } catch(err) {
                     console.log(err)
@@ -473,12 +507,33 @@ export default class InstancePageClass extends Vue {
         })
     }
 
-    handleCancel() {
-        this.modalVisible = false
+    handleCreateCancel() {
+        this.createModalVisible = false
     }
 
     handleCreate() {
-        this.modalVisible = true
+        (this.form as any).resetFields()
+        this.createModalVisible = true
+    }
+
+    handleEditOk() {
+        (this as any).form.validateFields((err: boolean, values: any) => {
+            if (! err) {
+                console.log(values)
+                if (values.choiceCount >= 0) {
+                    while (this.choices.length - 1 < values.choiceCount)
+                        this.choices.push({ id: this.choices.length, text: '' })
+                    while (this.choices.length - 1 > values.choiceCount)
+                        this.choices.pop()
+                    this.diagram.rebuildParts()
+                }
+            }
+        })
+        this.editModalVisible = false
+    }
+
+    handleEditCancel() {
+        this.editModalVisible = false
     }
 
     async handleSave() {
