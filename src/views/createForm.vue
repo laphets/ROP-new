@@ -94,7 +94,7 @@
                         </a-select>
                     </a-form-item>
                     <a-form-item label="选项个数">
-                        <a-input-number :min="0" :max="26" :defaultValue="0" :disabled="choiceDisabled"
+                        <a-input-number :min="0" :max="26" :initialValue="0" :disabled="choiceDisabled"
                             v-decorator="[
                                 'choiceCount',
                                 {
@@ -133,7 +133,7 @@ export default class InstancePageClass extends Vue {
     editModalVisible = false
     form = {} as object
     choiceDisabled = false
-    panel = {} as go.Panel
+    editIndex = -1
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -193,6 +193,17 @@ export default class InstancePageClass extends Vue {
         for (let degree of inDegree)
             if (degree > 0) return false
         return true
+    }
+
+    findIndex(key: number) {
+        const { nodeDataArray } = this.diagram.model as go.GraphLinksModel
+        nodeDataArray.every((item: any, index: number) => {
+            if (item.key === key) {
+                this.editIndex = index
+                return false
+            }
+            return true
+        })
     }
 
     generateForm() {
@@ -323,16 +334,16 @@ export default class InstancePageClass extends Vue {
         })
 
         diagram.addDiagramListener('ObjectDoubleClicked', async (e: any) => {
-            if (e.subject.panel.data) {
+            if (e.subject.panel instanceof go.Node && e.subject.panel.data) {
                 (this as any).form.resetFields()
+                this.findIndex(e.subject.panel.data.key)
                 this.editModalVisible = true
-                this.panel = e.subject.panel
                 await setTimeout(() => {
                     (this as any).form.setFieldsValue({
-                        category: this.panel.data.category,
-                        choiceCount: this.panel.data.choices.length - 1
+                        category: e.subject.panel.data.category,
+                        choiceCount: e.subject.panel.data.choices.length - 1
                     })
-                    this.choiceDisabled = (this.panel.data.category !== 'SELECT')
+                    this.choiceDisabled = (e.subject.panel.data.category !== 'SELECT')
                 }, 100)
             }
         })
@@ -491,11 +502,11 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    // { category: 'TEXT', choices: [defaultPort] },
-                    // { category: 'TEXTAREA', choices: [defaultPort] },
-                    // { category: 'INPUT', choices: [defaultPort] },
-                    // { category: 'UPLOAD', choices: [defaultPort] },
-                    // { category: 'BOX', choices: [defaultPort] },
+                    { category: 'TEXT', choices: [defaultPort] },
+                    { category: 'TEXTAREA', choices: [defaultPort] },
+                    { category: 'INPUT', choices: [defaultPort] },
+                    { category: 'UPLOAD', choices: [defaultPort] },
+                    { category: 'BOX', choices: [defaultPort] },
                     { category: 'SELECT', choices: [ defaultPort, { id: 1, text: 'A'}, { id: 2, text: 'B'}, { id: 3, text: 'C'}, { id: 4, text: 'D'} ] }
                 ])
             }
@@ -540,15 +551,18 @@ export default class InstancePageClass extends Vue {
     handleEditOk() {
         (this as any).form.validateFields((err: boolean, values: any) => {
             if (! err) {
-                console.log(values)
+                const { model } = this.diagram
+                model.nodeDataArray = JSON.parse(JSON.stringify(model.nodeDataArray))
+                const node = model.nodeDataArray[this.editIndex] as any
+                if (! node) return
                 if (values.category) {
-                    this.panel.data.category = `${values.category}`
+                    node.category = `${values.category}`
                 }
                 if (values.category !== 'SELECT') {
                     values.choiceCount = 0
                 }
                 if (values.choiceCount >= 0) {
-                    const { choices } = this.panel.data
+                    const { choices } = node
                     while (choices.length - 1 < values.choiceCount)
                         choices.push({ id: choices.length, text: '' })
                     while (choices.length - 1 > values.choiceCount)
