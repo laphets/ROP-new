@@ -76,8 +76,25 @@
             @cancel="handleEditCancel"
             >
                 <a-form :form="form">
+                    <a-form-item label="题目类型">
+                        <a-select @change="handleCategoryChange"
+                            v-decorator="[
+                                'category',
+                                {
+                                    rules: [{ required: true, message: '请选择题目类型' }]
+                                }
+                            ]"
+                        >
+                            <a-select-option value="SELECT">选择题</a-select-option>
+                            <a-select-option value="TEXT">简答题</a-select-option>
+                            <a-select-option value="TEXTAREA">论述题</a-select-option>
+                            <a-select-option value="INPUT">输入框</a-select-option>
+                            <a-select-option value="BOX">BOX</a-select-option>
+                            <a-select-option value="UPLOAD">上传文件</a-select-option>
+                        </a-select>
+                    </a-form-item>
                     <a-form-item label="选项个数">
-                        <a-input-number :min="0" :max="26"
+                        <a-input-number :min="0" :max="26" :defaultValue="0" :disabled="choiceDisabled"
                             v-decorator="[
                                 'choiceCount',
                                 {
@@ -106,7 +123,6 @@ const typeMap: {[key: string]: string} = { 'TEXT': '简答题', 'TEXTAREA': '论
 const defaultPort = { id: 'B', 'text': '默认跳转' }
 @Component
 export default class InstancePageClass extends Vue {
-            
     formList = [{ name: '' }] as RawForm[]
     renderList = [] as object[]
     diagram = {} as Diagram
@@ -116,7 +132,8 @@ export default class InstancePageClass extends Vue {
     createModalVisible = false
     editModalVisible = false
     form = {} as object
-    choices = [] as object[]
+    choiceDisabled = false
+    panel = {} as go.Panel
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -309,9 +326,13 @@ export default class InstancePageClass extends Vue {
             if (e.subject.panel.data) {
                 (this as any).form.resetFields()
                 this.editModalVisible = true
-                this.choices = e.subject.panel.data.choices
+                this.panel = e.subject.panel
                 await setTimeout(() => {
-                    (this as any).form.setFieldsValue({ choiceCount: this.choices.length - 1 })
+                    (this as any).form.setFieldsValue({
+                        category: this.panel.data.category,
+                        choiceCount: this.panel.data.choices.length - 1
+                    })
+                    this.choiceDisabled = (this.panel.data.category !== 'SELECT')
                 }, 100)
             }
         })
@@ -520,13 +541,20 @@ export default class InstancePageClass extends Vue {
         (this as any).form.validateFields((err: boolean, values: any) => {
             if (! err) {
                 console.log(values)
-                if (values.choiceCount >= 0) {
-                    while (this.choices.length - 1 < values.choiceCount)
-                        this.choices.push({ id: this.choices.length, text: '' })
-                    while (this.choices.length - 1 > values.choiceCount)
-                        this.choices.pop()
-                    this.diagram.rebuildParts()
+                if (values.category) {
+                    this.panel.data.category = `${values.category}`
                 }
+                if (values.category !== 'SELECT') {
+                    values.choiceCount = 0
+                }
+                if (values.choiceCount >= 0) {
+                    const { choices } = this.panel.data
+                    while (choices.length - 1 < values.choiceCount)
+                        choices.push({ id: choices.length, text: '' })
+                    while (choices.length - 1 > values.choiceCount)
+                        choices.pop()
+                }
+                this.diagram.rebuildParts()
             }
         })
         this.editModalVisible = false
@@ -534,6 +562,10 @@ export default class InstancePageClass extends Vue {
 
     handleEditCancel() {
         this.editModalVisible = false
+    }
+
+    handleCategoryChange(value: string) {
+        this.choiceDisabled = (value !== 'SELECT')
     }
 
     async handleSave() {
