@@ -10,7 +10,6 @@
             enterButton
             >
             </a-input-search>
-
                 <div v-for="item in renderList" :key="item.ID">
                     <div
                     class="card"
@@ -45,6 +44,7 @@
                     v-model="createModalVisible"
                     @ok="handleCreateOk"
                     @cancel="handleCreateCancel"
+                    :confirmLoading="confirmLoading"
                     >
                         <a-form :form="form">
                             <a-form-item label="表单名称">
@@ -77,14 +77,7 @@
             >
                 <a-form :form="form">
                     <a-form-item label="题目类型">
-                        <a-select @change="handleCategoryChange"
-                            v-decorator="[
-                                'category',
-                                {
-                                    rules: [{ required: true, message: '请选择题目类型' }]
-                                }
-                            ]"
-                        >
+                        <a-select @change="handleCategoryChange" v-decorator="['category', {}]">
                             <a-select-option value="SELECT">选择题</a-select-option>
                             <a-select-option value="TEXT">简答题</a-select-option>
                             <a-select-option value="TEXTAREA">论述题</a-select-option>
@@ -94,14 +87,7 @@
                         </a-select>
                     </a-form-item>
                     <a-form-item label="选项个数">
-                        <a-input-number :min="0" :max="26" :initialValue="0" :disabled="choiceDisabled"
-                            v-decorator="[
-                                'choiceCount',
-                                {
-                                    rules: [{ required: true, message: '请输入选项个数' }]
-                                }
-                            ]"
-                        />
+                        <a-input-number :min="0" :max="26" :initialValue="0" :disabled="choiceDisabled" v-decorator="['choiceCount', {}]" />
                     </a-form-item>
                 </a-form>
             </a-modal>
@@ -134,6 +120,7 @@ export default class InstancePageClass extends Vue {
     form = {} as object
     choiceDisabled = false
     editIndex = -1
+    confirmLoading = false
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -524,12 +511,14 @@ export default class InstancePageClass extends Vue {
     }
 
     handleCreateOk() {
+        this.confirmLoading = true;
         (this as any).form.validateFields(async (err: boolean, values: any) => {
             if (! err) {
                 try {
                     console.log(values)
                     await createForm({ ...values, data : [] })
                     await this.getData()
+                    this.confirmLoading = false
                     this.createModalVisible = false
                     successMessage('创建成功')
                 } catch(err) {
@@ -537,6 +526,7 @@ export default class InstancePageClass extends Vue {
                 }
             }
         })
+        this.confirmLoading = false
     }
 
     handleCreateCancel() {
@@ -549,27 +539,25 @@ export default class InstancePageClass extends Vue {
     }
 
     handleEditOk() {
-        (this as any).form.validateFields((err: boolean, values: any) => {
-            if (! err) {
-                const { model } = this.diagram
-                model.nodeDataArray = JSON.parse(JSON.stringify(model.nodeDataArray))
-                const node = model.nodeDataArray[this.editIndex] as any
-                if (! node) return
-                if (values.category) {
-                    node.category = `${values.category}`
-                }
-                if (values.category !== 'SELECT') {
-                    values.choiceCount = 0
-                }
-                if (values.choiceCount >= 0) {
-                    const { choices } = node
-                    while (choices.length - 1 < values.choiceCount)
-                        choices.push({ id: choices.length, text: '' })
-                    while (choices.length - 1 > values.choiceCount)
-                        choices.pop()
-                }
-                this.diagram.rebuildParts()
+        (this as any).form.validateFields(async (err: boolean, values: any) => {
+            const { model } = this.diagram
+            model.nodeDataArray = await JSON.parse(JSON.stringify(model.nodeDataArray))
+            const node = model.nodeDataArray[this.editIndex] as any
+            if (! node) return
+            if (values.category) {
+                node.category = `${values.category}`
             }
+            if (values.category !== 'SELECT') {
+                values.choiceCount = 0
+            }
+            if (values.choiceCount >= 0) {
+                const { choices } = node
+                while (choices.length - 1 < values.choiceCount)
+                    choices.push({ id: choices.length, text: '' })
+                while (choices.length - 1 > values.choiceCount)
+                    choices.pop()
+            }
+            await this.diagram.rebuildParts()
         })
         this.editModalVisible = false
     }
