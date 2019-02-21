@@ -42,9 +42,9 @@
                     <a-button @click="handleCreate" :type="'primary'">新建表单</a-button>
                     <a-modal
                     title="新建表单"
-                    v-model="modalVisible"
-                    @ok="handleOk"
-                    @cancel="handleCancel"
+                    v-model="createModalVisible"
+                    @ok="handleCreateOk"
+                    @cancel="handleCreateCancel"
                     >
                         <a-form :form="form">
                             <a-form-item label="表单名称">
@@ -69,6 +69,42 @@
                 <div id="palette" style="height: 15%;"></div>
                 <div id="diagram" style="height: 85%;"></div>
             </div>
+            <a-modal
+            title="编辑问题"
+            v-model="editModalVisible"
+            @ok="handleEditOk"
+            @cancel="handleEditCancel"
+            >
+                <a-form :form="form">
+                    <a-form-item label="题目类型">
+                        <a-select @change="handleCategoryChange"
+                            v-decorator="[
+                                'category',
+                                {
+                                    rules: [{ required: true, message: '请选择题目类型' }]
+                                }
+                            ]"
+                        >
+                            <a-select-option value="SELECT">选择题</a-select-option>
+                            <a-select-option value="TEXT">简答题</a-select-option>
+                            <a-select-option value="TEXTAREA">论述题</a-select-option>
+                            <a-select-option value="INPUT">输入框</a-select-option>
+                            <a-select-option value="BOX">BOX</a-select-option>
+                            <a-select-option value="UPLOAD">上传文件</a-select-option>
+                        </a-select>
+                    </a-form-item>
+                    <a-form-item label="选项个数">
+                        <a-input-number :min="0" :max="26" :initialValue="0" :disabled="choiceDisabled"
+                            v-decorator="[
+                                'choiceCount',
+                                {
+                                    rules: [{ required: true, message: '请输入选项个数' }]
+                                }
+                            ]"
+                        />
+                    </a-form-item>
+                </a-form>
+            </a-modal>
         </div>
     </div>
 </template>
@@ -81,20 +117,23 @@ import { getFormList, updateForm, createForm } from '@/api/form';
 import { successMessage, errorMessage } from '@/utils/message';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import { setTimeout } from 'timers';
 let $ = go.GraphObject.make
 const typeMap: {[key: string]: string} = { 'TEXT': '简答题', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '上传文件', 'BOX': 'BOX', 'SELECT': '选择题' }
 const defaultPort = { id: 'B', 'text': '默认跳转' }
 @Component
 export default class InstancePageClass extends Vue {
-            
     formList = [{ name: '' }] as RawForm[]
     renderList = [] as object[]
     diagram = {} as Diagram
     tempForm = {} as IForm
     buttonDisabled = true
     selectedID = 0
-    modalVisible = false
+    createModalVisible = false
+    editModalVisible = false
     form = {} as object
+    choiceDisabled = false
+    editIndex = -1
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -154,6 +193,17 @@ export default class InstancePageClass extends Vue {
         for (let degree of inDegree)
             if (degree > 0) return false
         return true
+    }
+
+    findIndex(key: number) {
+        const { nodeDataArray } = this.diagram.model as go.GraphLinksModel
+        nodeDataArray.every((item: any, index: number) => {
+            if (item.key === key) {
+                this.editIndex = index
+                return false
+            }
+            return true
+        })
     }
 
     generateForm() {
@@ -283,6 +333,21 @@ export default class InstancePageClass extends Vue {
             this.buttonDisabled = !diagram.isModified
         })
 
+        diagram.addDiagramListener('ObjectDoubleClicked', async (e: any) => {
+            if (e.subject.panel instanceof go.Node && e.subject.panel.data) {
+                (this as any).form.resetFields()
+                this.findIndex(e.subject.panel.data.key)
+                this.editModalVisible = true
+                await setTimeout(() => {
+                    (this as any).form.setFieldsValue({
+                        category: e.subject.panel.data.category,
+                        choiceCount: e.subject.panel.data.choices.length - 1
+                    })
+                    this.choiceDisabled = (e.subject.panel.data.category !== 'SELECT')
+                }, 100)
+            }
+        })
+
         const nodeStyle = [
             new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
             {
@@ -375,7 +440,8 @@ export default class InstancePageClass extends Vue {
                                         font: `12px ${fontFamily}`,
                                         stroke: '#028bc4',
                                         textAlign: 'center',
-                                        margin: new go.Margin(3, 5)
+                                        margin: new go.Margin(3, 5),
+                                        editable: true
                                     },
                                     new go.Binding('text', 'text'),
                                     new go.Binding('stroke', 'id', v => v === 'B' ? '#028bc4' : '#00a35c')
@@ -457,14 +523,14 @@ export default class InstancePageClass extends Vue {
         this.loadForm()
     }
 
-    handleOk() {
-        (this.form as any).validateFields(async (err: boolean, values: any) => {
+    handleCreateOk() {
+        (this as any).form.validateFields(async (err: boolean, values: any) => {
             if (! err) {
                 try {
                     console.log(values)
                     await createForm({ ...values, data : [] })
                     await this.getData()
-                    this.modalVisible = false
+                    this.createModalVisible = false
                     successMessage('创建成功')
                 } catch(err) {
                     console.log(err)
@@ -473,12 +539,47 @@ export default class InstancePageClass extends Vue {
         })
     }
 
-    handleCancel() {
-        this.modalVisible = false
+    handleCreateCancel() {
+        this.createModalVisible = false
     }
 
     handleCreate() {
-        this.modalVisible = true
+        (this.form as any).resetFields()
+        this.createModalVisible = true
+    }
+
+    handleEditOk() {
+        (this as any).form.validateFields((err: boolean, values: any) => {
+            if (! err) {
+                const { model } = this.diagram
+                model.nodeDataArray = JSON.parse(JSON.stringify(model.nodeDataArray))
+                const node = model.nodeDataArray[this.editIndex] as any
+                if (! node) return
+                if (values.category) {
+                    node.category = `${values.category}`
+                }
+                if (values.category !== 'SELECT') {
+                    values.choiceCount = 0
+                }
+                if (values.choiceCount >= 0) {
+                    const { choices } = node
+                    while (choices.length - 1 < values.choiceCount)
+                        choices.push({ id: choices.length, text: '' })
+                    while (choices.length - 1 > values.choiceCount)
+                        choices.pop()
+                }
+                this.diagram.rebuildParts()
+            }
+        })
+        this.editModalVisible = false
+    }
+
+    handleEditCancel() {
+        this.editModalVisible = false
+    }
+
+    handleCategoryChange(value: string) {
+        this.choiceDisabled = (value !== 'SELECT')
     }
 
     async handleSave() {
