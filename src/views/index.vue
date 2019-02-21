@@ -1,9 +1,9 @@
 <template>
     <div class="index-page">
         <div class="events-card">
-          <a-button @click="openChat()">Open</a-button>
-            <ChatComponent :visible.sync="visible" :interviewId="roomId"></ChatComponent>
-            <!-- <a-calendar>
+          <!-- <a-button @click="openChat()">Open</a-button> -->
+            <!-- <ChatComponent :visible.sync="visible" :interviewId="roomId"></ChatComponent> -->
+            <a-calendar>
                 <ul class="events" slot="dateCellRender" slot-scope="value">
                 <li v-for="item in getListData(value)" :key="item.content">
                     <a-badge :status="item.type" :text="item.content" />
@@ -15,7 +15,7 @@
                     <span>Backlog number</span>
                 </div>
                 </template>
-            </a-calendar> -->
+            </a-calendar>
         </div>
 
     </div>
