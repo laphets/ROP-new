@@ -199,7 +199,7 @@ export default class InstancePageClass extends Vue {
         const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
         nodeDataArray.forEach((item: any, index: number) => {
             inverseMap[item.key] = index + 1
-            let node = { tag: index + 1, type: item.category, text: item.next, next: -1 }
+            let node = { tag: index + 1, type: item.category, text: item.text, next: -1 }
             if (item.category === 'SELECT') {
                 let choices = [] as IChoice[]
                 for (let c of item.choices) {
@@ -399,9 +399,8 @@ export default class InstancePageClass extends Vue {
                         margin: new go.Margin(5, 0),
                         editable: true,
                         alignment: go.Spot.TopLeft,
-                        maxSize: new go.Size(160, NaN),
-                        text: '请输入问题'
-                    }, new go.Binding('text', 'text').makeTwoWay()),
+                        maxSize: new go.Size(160, NaN)
+                    }, new go.Binding('text').makeTwoWay()),
                     $(go.Panel, 'Horizontal', { alignment: go.Spot.BottomCenter },
                         new go.Binding('itemArray', 'choices'),
                         {
@@ -489,12 +488,12 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', choices: [defaultPort] },
-                    { category: 'TEXTAREA', choices: [defaultPort] },
-                    { category: 'INPUT', choices: [defaultPort] },
-                    { category: 'UPLOAD', choices: [defaultPort] },
-                    { category: 'BOX', choices: [defaultPort] },
-                    { category: 'SELECT', choices: [ defaultPort, { id: 1, text: 'A'}, { id: 2, text: 'B'}, { id: 3, text: 'C'}, { id: 4, text: 'D'} ] }
+                    { category: 'TEXT', text:'请输入问题', choices: [defaultPort] },
+                    { category: 'TEXTAREA', text:'请输入问题', choices: [defaultPort] },
+                    { category: 'INPUT', text:'请输入问题', choices: [defaultPort] },
+                    { category: 'UPLOAD', text:'请输入问题', choices: [defaultPort] },
+                    { category: 'BOX', text:'请输入问题', choices: [defaultPort] },
+                    { category: 'SELECT', text:'请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ] }
                 ])
             }
         )
@@ -574,6 +573,7 @@ export default class InstancePageClass extends Vue {
         if (this.judgeModel()) {
             try {
                 this.tempForm.data = this.generateForm()
+                console.log('data:', this.tempForm.data)
                 await updateForm(this.selectedID, { name: this.tempForm.name, data: this.tempForm.data })
                 await this.getData()
                 this.diagram.isModified = false
