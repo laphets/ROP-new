@@ -574,7 +574,7 @@ export default class InstancePageClass extends Vue {
         if (this.judgeModel()) {
             try {
                 this.tempForm.data = this.generateForm()
-                await updateForm(this.selectedID, { name: this.tempForm.name, data: JSON.stringify(this.tempForm.data) })
+                await updateForm(this.selectedID, { name: this.tempForm.name, data: this.tempForm.data })
                 await this.getData()
                 this.diagram.isModified = false
                 successMessage('保存成功')
