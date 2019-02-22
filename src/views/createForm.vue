@@ -92,6 +92,21 @@
                     <a-form-item label="最多选择个数" :style="{ display: choiceDisabled ? 'none' : 'block' }" >
                         <a-input-number :min="0" :max="26" :initialValue="0" v-decorator="['available_cnt', {}]" />
                     </a-form-item>
+                    <a-form-item label="是否必填">
+                        <a-checkbox v-decorator="['required', { valuePropName: 'checked' }]" />
+                    </a-form-item>
+                    <a-form-item label="特殊题目类型">
+                        <a-select initialValue="NULL" v-decorator="['spec', {}]" style="width: 140px">
+                            <a-select-option value="NULL">无</a-select-option>
+                            <a-select-option value="NAME">姓名</a-select-option>
+                            <a-select-option value="ZJUID">学号</a-select-option>
+                            <a-select-option value="GENDER">性别</a-select-option>
+                            <a-select-option value="MOBILE">手机</a-select-option>
+                            <a-select-option value="EMAIL">邮箱</a-select-option>
+                            <a-select-option value="PHOTO">生活照</a-select-option>
+                            <a-select-option value="DEPART">部门志愿选择</a-select-option>
+                        </a-select>    
+                    </a-form-item>
                 </a-form>
             </a-modal>
         </div>
@@ -202,7 +217,14 @@ export default class InstancePageClass extends Vue {
         const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
         nodeDataArray.forEach((item: any, index: number) => {
             inverseMap[item.key] = index + 1
-            let node = { tag: index + 1, type: item.category, text: item.text, next: -1 }
+            let node = {
+                tag: index + 1,
+                type: item.category,
+                text: item.text,
+                next: -1,
+                spec: item.spec,
+                required: item.required
+            }
             if (item.category === 'SELECT') {
                 let choices = [] as IChoice[]
                 for (let c of item.choices) {
@@ -233,7 +255,15 @@ export default class InstancePageClass extends Vue {
         let model = this.createEmptyModel()
         let NArray = [], LArray = []
         for (let item of data) {
-            let node = { key: item.tag, category: item.type, text: item.text, choices: [defaultPort] as object[] }
+            let node = { 
+                key: item.tag,
+                category: item.type,
+                text: item.text,
+                choices: [defaultPort] as object[],
+                spec: item.spec,
+                available_cnt: item.available_cnt,
+                required: item.required
+            }
             if (item.next !== -1) {
                 LArray.push({ from: item.tag, to: item.next, fromPort: 'B', toPort: 'T' })
             }
@@ -332,7 +362,9 @@ export default class InstancePageClass extends Vue {
                     (this as any).form.setFieldsValue({
                         category: e.subject.panel.data.category,
                         choiceCount: e.subject.panel.data.choices.length - 1,
-                        available_cnt: e.subject.panel.data.available_cnt | 0
+                        available_cnt: e.subject.panel.data.available_cnt || 0,
+                        spec: e.subject.panel.data.spec || 'NULL',
+                        required: e.subject.panel.data.required
                     })
                     this.choiceDisabled = (e.subject.panel.data.category !== 'SELECT')
                 }, 100)
@@ -562,6 +594,10 @@ export default class InstancePageClass extends Vue {
             if (values.available_cnt) {
                 node.available_cnt = values.available_cnt
             }
+            if (values.spec && values.spec !== 'NULL') {
+                node.spec = values.spec
+            }
+            node.required = values.required
             await this.diagram.rebuildParts()
         })
         this.editModalVisible = false
