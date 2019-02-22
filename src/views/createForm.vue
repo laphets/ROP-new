@@ -75,7 +75,7 @@
             @ok="handleEditOk"
             @cancel="handleEditCancel"
             >
-                <a-form :form="form">
+                <a-form :form="form" :layout="'inline'">
                     <a-form-item label="题目类型">
                         <a-select @change="handleCategoryChange" v-decorator="['category', {}]">
                             <a-select-option value="SELECT">选择题</a-select-option>
@@ -86,8 +86,26 @@
                             <a-select-option value="UPLOAD">上传文件</a-select-option>
                         </a-select>
                     </a-form-item>
-                    <a-form-item label="选项个数">
-                        <a-input-number :min="0" :max="26" :initialValue="0" :disabled="choiceDisabled" v-decorator="['choiceCount', {}]" />
+                    <a-form-item label="选项个数" :style="{ display: choiceDisabled ? 'none' : 'block' }" >
+                        <a-input-number :min="0" :max="26" :initialValue="0" v-decorator="['choiceCount', {}]" />
+                    </a-form-item>
+                    <a-form-item label="最多选择个数" :style="{ display: choiceDisabled ? 'none' : 'block' }" >
+                        <a-input-number :min="0" :max="26" :initialValue="0" v-decorator="['available_cnt', {}]" />
+                    </a-form-item>
+                    <a-form-item label="是否必填">
+                        <a-checkbox v-decorator="['required', { valuePropName: 'checked' }]" />
+                    </a-form-item>
+                    <a-form-item label="特殊题目类型">
+                        <a-select initialValue="NULL" v-decorator="['spec', {}]" style="width: 140px">
+                            <a-select-option value="NULL">无</a-select-option>
+                            <a-select-option value="NAME">姓名</a-select-option>
+                            <a-select-option value="ZJUID">学号</a-select-option>
+                            <a-select-option value="GENDER">性别</a-select-option>
+                            <a-select-option value="MOBILE">手机</a-select-option>
+                            <a-select-option value="EMAIL">邮箱</a-select-option>
+                            <a-select-option value="PHOTO">生活照</a-select-option>
+                            <a-select-option value="DEPART">部门志愿选择</a-select-option>
+                        </a-select>    
                     </a-form-item>
                 </a-form>
             </a-modal>
@@ -199,14 +217,21 @@ export default class InstancePageClass extends Vue {
         const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
         nodeDataArray.forEach((item: any, index: number) => {
             inverseMap[item.key] = index + 1
-            let node = { tag: index + 1, type: item.category, text: item.text, next: -1 }
+            let node = {
+                tag: index + 1,
+                type: item.category,
+                text: item.text,
+                next: -1,
+                spec: item.spec,
+                required: item.required
+            }
             if (item.category === 'SELECT') {
                 let choices = [] as IChoice[]
                 for (let c of item.choices) {
                     if (c.id === 'B') continue
                     choices.push({ tag: c.id, text: c.text, next: -1 })
                 }
-                data.push({ ... node, choices: choices })
+                data.push({ ... node, choices: choices, available_cnt: item.available_cnt })
             } else {
                 data.push(node)
             }
@@ -230,7 +255,15 @@ export default class InstancePageClass extends Vue {
         let model = this.createEmptyModel()
         let NArray = [], LArray = []
         for (let item of data) {
-            let node = { key: item.tag, category: item.type, text: item.text, choices: [defaultPort] as object[] }
+            let node = { 
+                key: item.tag,
+                category: item.type,
+                text: item.text,
+                choices: [defaultPort] as object[],
+                spec: item.spec,
+                available_cnt: item.available_cnt,
+                required: item.required
+            }
             if (item.next !== -1) {
                 LArray.push({ from: item.tag, to: item.next, fromPort: 'B', toPort: 'T' })
             }
@@ -328,7 +361,10 @@ export default class InstancePageClass extends Vue {
                 await setTimeout(() => {
                     (this as any).form.setFieldsValue({
                         category: e.subject.panel.data.category,
-                        choiceCount: e.subject.panel.data.choices.length - 1
+                        choiceCount: e.subject.panel.data.choices.length - 1,
+                        available_cnt: e.subject.panel.data.available_cnt || 0,
+                        spec: e.subject.panel.data.spec || 'NULL',
+                        required: e.subject.panel.data.required
                     })
                     this.choiceDisabled = (e.subject.panel.data.category !== 'SELECT')
                 }, 100)
@@ -493,7 +529,7 @@ export default class InstancePageClass extends Vue {
                     { category: 'INPUT', text:'请输入问题', choices: [defaultPort] },
                     { category: 'UPLOAD', text:'请输入问题', choices: [defaultPort] },
                     { category: 'BOX', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'SELECT', text:'请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ] }
+                    { category: 'SELECT', text:'请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1 }
                 ])
             }
         )
@@ -555,6 +591,13 @@ export default class InstancePageClass extends Vue {
                 while (choices.length - 1 > values.choiceCount)
                     choices.pop()
             }
+            if (values.available_cnt) {
+                node.available_cnt = values.available_cnt
+            }
+            if (values.spec && values.spec !== 'NULL') {
+                node.spec = values.spec
+            }
+            node.required = values.required
             await this.diagram.rebuildParts()
         })
         this.editModalVisible = false
