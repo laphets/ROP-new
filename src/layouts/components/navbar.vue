@@ -24,7 +24,8 @@
                 </div>
                 <a-dropdown>
                 <div class="user-profile-body">
-                    <img class="user-avatar" :src="avatar">
+                    <img v-if="avatar" class="user-avatar" :src="avatar">
+                    <a-avatar v-else class="user-avatar-a" slot="avatar" :style="{backgroundColor: '#7265e6', verticalAlign: 'middle'}"> {{innerId[0]}} </a-avatar>
                     <span class="user-name">{{department}}  {{innerId}}</span>
                 </div>
                 <a-menu class="user-dropdown" slot="overlay" @click="meToogle">
@@ -133,6 +134,12 @@ export default class NavbarClass extends Vue {
       height: 24px;
       margin: 0 8px 0 12px;
       border-radius: 4px;
+    }
+    .user-avatar-a {
+        margin: 0 6px 0 12px;
+        width: 28px;
+        height: 28px;
+        line-height: 30px;
     }
     .user-name {
       color: rgba(0,0,0,.65);

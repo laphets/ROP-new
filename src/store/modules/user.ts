@@ -1,7 +1,7 @@
 import {Store, Module, Mutation, MutationTree, ActionTree} from 'vuex';
 import { UserState } from '@/store/modules/interfaces/user.interface';
 import db from '@/utils/db';
-import { login, getUserInfo } from '@/api/user';
+import { login, getUserInfo, getSMSInfo } from '@/api/user';
 
 export default {
     state: {
@@ -54,6 +54,8 @@ export default {
         async GetUserInfo({ commit, state }) {
             try {
                 const { ZJUid, name, inner_id, department, avatar } = ((await getUserInfo()).data).data
+                const SMSRes = await getSMSInfo()
+                console.log(SMSRes)
                 commit('SET_ZJUID', ZJUid)
                 commit('SET_NAME', name)
                 commit('SET_INNERID', inner_id)

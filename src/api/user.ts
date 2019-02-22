@@ -12,3 +12,7 @@ export const getUserInfo = () => {
 export const updateAvatar = (url: string) => {
     return request.post('v1/user/avatar', {url})
 }
+
+export const getSMSInfo = () => {
+    return request.get('v1/user/sms')
+}

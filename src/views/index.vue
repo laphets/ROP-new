@@ -32,7 +32,7 @@ import ChatComponent from '@/components/chat.vue'
 })
 export default class IndexPageClass extends Vue {
     created() {
-        console.log('233')
+        // console.log('233')
     }
 
     openChat() {
