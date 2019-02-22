@@ -402,7 +402,7 @@ export default class InstancePageClass extends Vue {
                         maxSize: new go.Size(160, NaN)
                     }, new go.Binding('text').makeTwoWay()),
                     $(go.Panel, 'Horizontal', { alignment: go.Spot.BottomCenter },
-                        new go.Binding('itemArray', 'choices'),
+                        new go.Binding('itemArray', 'choices').makeTwoWay(),
                         {
                             row: 2, column: 0,
                             itemTemplate: $(go.Panel, 'Auto', {
@@ -429,7 +429,7 @@ export default class InstancePageClass extends Vue {
                                         margin: new go.Margin(3, 5),
                                         editable: true
                                     },
-                                    new go.Binding('text', 'text'),
+                                    new go.Binding('text').makeTwoWay(),
                                     new go.Binding('stroke', 'id', v => v === 'B' ? '#028bc4' : '#00a35c')
                                 )
                             )
@@ -514,8 +514,7 @@ export default class InstancePageClass extends Vue {
         (this as any).form.validateFields(async (err: boolean, values: any) => {
             if (! err) {
                 try {
-                    console.log(values)
-                    await createForm({ ...values, data : [] })
+                    await createForm({ ...values, data: [] })
                     await this.getData()
                     this.confirmLoading = false
                     this.createModalVisible = false
