@@ -15,7 +15,20 @@
         <div class="user-profile-container" trigger="click">
             <div class="user-profile-content">
                 <div class="menu-icons">
-                <span class="menu-icon"><a-icon class="icon" type="search" /></span>
+                
+                <span class="menu-icon message-icon" >
+                <a-tooltip placement="bottom" >
+                    <template slot="title">
+                        <span>短信账户余额: ￥{{smsBalance}} <br> 预计发送量: {{smsBalance/0.05}}条</span>
+                    </template>
+                    <!-- <a-badge :numberStyle= "{backgroundColor: '#3d91f7'}" class="message-badge" :count="smsBalance/0.05" :overflowCount="999"> -->
+                    <a-badge class="message-badge" :count="smsBalance/0.05" :overflowCount="999">
+                        <a-icon class="icon" type="message" />
+                    </a-badge>
+                </a-tooltip>
+                </span>
+                
+                <!-- <span class="menu-icon"><a-icon class="icon" type="message" /></span> -->
                 <span class="menu-icon">
                     <!-- <a-badge dot class="item"> -->
                         <a-icon class="icon" type="bell" />
@@ -57,6 +70,11 @@ export default class NavbarClass extends Vue {
     @Getter('innerId') innerId!: string;
     @Getter('instanceName') instanceName!: string;
     @Getter('avatar') avatar!: string;
+    @Getter('smsBalance') smsBalance!: number;
+
+    created() {
+        console.log(this.smsBalance)
+    }
 
     instanceToogle({ key }: any) {
         if (key === '1') {
@@ -135,11 +153,17 @@ export default class NavbarClass extends Vue {
       margin: 0 8px 0 12px;
       border-radius: 4px;
     }
+    .message-icon {
+        margin-right: 20px;
+    }
     .user-avatar-a {
         margin: 0 6px 0 12px;
         width: 28px;
         height: 28px;
         line-height: 30px;
+    }
+    .ant-badge-count {
+        right: -20px !important;
     }
     .user-name {
       color: rgba(0,0,0,.65);

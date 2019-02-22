@@ -10,7 +10,8 @@ export default {
         innerId: '',
         department: '',
         avatar: '',
-        token: db.token.get()
+        token: db.token.get(),
+        smsBalance: 0,
     },
     mutations: {
         SET_ZJUID: (state, ZJUid) => {
@@ -31,6 +32,9 @@ export default {
         },
         SET_AVATAR: (state, avatar) => {
             state.avatar = avatar;
+        },
+        SET_SMSBALANCE: (state, balance) => {
+            state.smsBalance = balance;
         }
     },
     actions: {
@@ -54,13 +58,13 @@ export default {
         async GetUserInfo({ commit, state }) {
             try {
                 const { ZJUid, name, inner_id, department, avatar } = ((await getUserInfo()).data).data
-                const SMSRes = await getSMSInfo()
-                console.log(SMSRes)
+                const { data: SMSRes } = await getSMSInfo()
                 commit('SET_ZJUID', ZJUid)
                 commit('SET_NAME', name)
                 commit('SET_INNERID', inner_id)
                 commit('SET_DEPARTMENT', department)
                 commit('SET_AVATAR', avatar)
+                commit('SET_SMSBALANCE', SMSRes.data.balance)
                 return { ZJUid, name, inner_id, department }
             } catch (error) {
                 return Promise.reject(error)

@@ -5,4 +5,5 @@ export interface UserState {
     department: string;
     token: string;
     avatar: string;
+    smsBalance: number;
 }

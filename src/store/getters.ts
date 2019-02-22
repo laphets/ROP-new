@@ -2,7 +2,7 @@
  * @Author: Laphets 
  * @Date: 2018-07-12 10:44:04 
  * @Last Modified by: Laphets
- * @Last Modified time: 2018-08-24 11:02:16
+ * @Last Modified time: 2019-02-22 23:46:46
  */
 
 import { Getter, GetterTree } from 'vuex';
@@ -27,4 +27,5 @@ export default {
     instancdId: state => state.app.instanceId,
     instanceName: state => state.app.instanceName,
     routers: state => state.router.routers,
+    smsBalance: state => state.user.smsBalance
 } as MyGetterTree<CombineState, any>
