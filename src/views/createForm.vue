@@ -128,8 +128,8 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { setTimeout } from 'timers';
 let $ = go.GraphObject.make
-const typeMap: {[key: string]: string} = { 'TEXT': '文本提示', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '文件上传', 'BOX': 'BOX', 'SELECT': '选择题' }
-const defaultPort = { id: 'B', 'text': '默认跳转' }
+const typeMap: {[key: string]: string} = { TEXT: '文本提示', TEXTAREA: '论述题', INPUT: '输入框', UPLOAD: '文件上传', BOX: 'BOX', SELECT: '选择题' }
+const defaultPort = { id: 'B', text: '默认跳转' }
 @Component
 export default class InstancePageClass extends Vue {
     formList = [{ name: '' }] as RawForm[]
@@ -151,7 +151,7 @@ export default class InstancePageClass extends Vue {
         const { data } = (await getFormList()).data
         this.formList = data
         this.renderList = []
-        data.forEach((item: RawForm)=> {
+        data.forEach((item: RawForm) => {
             this.renderList.push({ name: item.name, ID: item.ID, UpdatedAt: item.UpdatedAt })
         })
     }
@@ -188,7 +188,7 @@ export default class InstancePageClass extends Vue {
         const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
         const n = nodeDataArray.length
         let inDegree: number[] = new Array<number>(n)
-        let adjEdge: number[][] = new Array<Array<number>>(n)
+        let adjEdge: number[][] = new Array<number[]>(n)
         let queue: number[] = []
         nodeDataArray.forEach((item: any, index: number) => {
             inverseMap[item.key] = index
@@ -201,9 +201,9 @@ export default class InstancePageClass extends Vue {
             adjEdge[u].push(v)
         }
         inDegree.forEach((degree: number, vertex: number) => {
-            if (degree === 0) queue.push(vertex)
+            if (degree === 0) { queue.push(vertex) }
         })
-        if (queue.length > 1) return false
+        if (queue.length > 1) { return false }
         while (queue.length) {
             let u = queue[0]
             queue.shift()
@@ -213,8 +213,9 @@ export default class InstancePageClass extends Vue {
                 }
             }
         }
-        for (let degree of inDegree)
-            if (degree > 0) return false
+        for (let degree of inDegree) {
+            if (degree > 0) { return false
+        } }
         return true
     }
 
@@ -247,10 +248,10 @@ export default class InstancePageClass extends Vue {
             if (item.category === 'SELECT') {
                 let choices = [] as IChoice[]
                 for (let c of item.choices) {
-                    if (c.id === 'B') continue
+                    if (c.id === 'B') { continue }
                     choices.push({ tag: c.id, text: c.text, next: -1 })
                 }
-                data.push({ ... node, choices: choices, available_cnt: item.available_cnt })
+                data.push({ ... node, choices, available_cnt: item.available_cnt })
             } else {
                 data.push(node)
             }
@@ -260,8 +261,9 @@ export default class InstancePageClass extends Vue {
             const node = data[u - 1] as any
             if (e.fromPort === 'B') {
                 node.next = v
-                if (node.type === 'SELECT')
+                if (node.type === 'SELECT') {
                     node.default_jump = true
+                }
             } else {
                 const index = Number(e.fromPort) - 1
                 node.choices[index].next = v
@@ -364,7 +366,7 @@ export default class InstancePageClass extends Vue {
             'scrollsPageOnFocus': false,
             'undoManager.isEnabled': true,
             'grid.visible': false,
-            layout: $(go.TreeLayout, {
+            "layout": $(go.TreeLayout, {
                 angle: 90
             })
         })
@@ -547,12 +549,12 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'TEXTAREA', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'INPUT', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'UPLOAD', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'BOX', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'SELECT', text:'请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1 }
+                    { category: 'TEXT', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'TEXTAREA', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'INPUT', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'UPLOAD', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'BOX', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'SELECT', text: '请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1 }
                 ])
             }
         )
@@ -578,7 +580,7 @@ export default class InstancePageClass extends Vue {
                     this.confirmLoading = false
                     this.createModalVisible = false
                     successMessage('创建成功')
-                } catch(err) {
+                } catch (err) {
                     console.log(err)
                 }
             }
@@ -600,7 +602,7 @@ export default class InstancePageClass extends Vue {
             const { model } = this.diagram
             model.nodeDataArray = await JSON.parse(JSON.stringify(model.nodeDataArray))
             const node = model.nodeDataArray[this.editIndex] as any
-            if (! node) return
+            if (! node) { return }
             if (values.category) {
                 node.category = `${values.category}`
             }
@@ -609,10 +611,12 @@ export default class InstancePageClass extends Vue {
             }
             if (values.choiceCount >= 0) {
                 const { choices } = node
-                while (choices.length - 1 < values.choiceCount)
+                while (choices.length - 1 < values.choiceCount) {
                     choices.push({ id: choices.length, text: '' })
-                while (choices.length - 1 > values.choiceCount)
+                }
+                while (choices.length - 1 > values.choiceCount) {
                     choices.pop()
+                }
             }
             if (values.available_cnt) {
                 node.available_cnt = values.available_cnt
@@ -621,7 +625,7 @@ export default class InstancePageClass extends Vue {
                 node.spec = values.spec
             }
             node.required = values.required
-            if (values.re && values.re != '') {
+            if (values.re && values.re !== '') {
                 node.re = values.re
             }
             await this.diagram.rebuildParts()
