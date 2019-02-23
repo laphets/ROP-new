@@ -8,7 +8,7 @@ const instance = axios.create({
     timeout: 20000
 })
 
-instance.interceptors.request.use((config)=> {
+instance.interceptors.request.use((config) => {
     if ((config as any).isSocket) {
         config.baseURL = '/socket'
     }
