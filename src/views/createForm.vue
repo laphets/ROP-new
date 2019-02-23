@@ -35,7 +35,7 @@
                 </div>
         </div>
 
-        <div class="gojs-container">
+        <div class="gojs-container" ref="gojs-container" id="gojs-container">
             <div class="btn-container">
                 <div class="left">
                     <a-button @click="handleCreate" :type="'primary'">新建表单</a-button>
@@ -63,6 +63,8 @@
                     <a-button @click="handleClear">全部清空</a-button>
                     <a-button :disabled="! selectedID" @click="handleUndo">撤销操作</a-button>
                     <a-button :disabled="buttonDisabled" @click="handleSave" :type="'primary'">保存</a-button>
+                    <a-button type="primary" :ghost="true" shape="circle" @click="handleFullscreen()" :icon="!fullScreen? 'fullscreen':'fullscreen-exit'" />
+                    <!-- <a-button @click="handleFulscreen" :type="'primary'">全屏</a-button> -->
                 </div>
             </div>
             <div class="editor-container">
@@ -139,6 +141,7 @@ export default class InstancePageClass extends Vue {
     choiceDisabled = false
     editIndex = -1
     confirmLoading = false
+    fullScreen = false
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -156,6 +159,17 @@ export default class InstancePageClass extends Vue {
 
     parse_time(time: any) {
         return moment(new Date(time)).format('LLL')
+    }
+
+    handleFullscreen() {
+        if (this.fullScreen) {
+            this.fullScreen = false;
+            (this.$refs['gojs-container'] as any).exitFullscreen()
+        } else {
+            this.fullScreen = true;
+            (this.$refs['gojs-container'] as any).webkitRequestFullscreen()
+        }
+
     }
 
     createEmptyModel() {
@@ -630,12 +644,21 @@ export default class InstancePageClass extends Vue {
 }
 </script>
 
-<style lang="less" scoped>
-.action {
-    border-top: 0px !important;
-    background: #ffffff !important;
+<style lang="less">
+canvas {
+    border: 0 !important;
+    outline: none !important;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0) !important; /* mobile webkit */
 }
+
 .page-container{
+    .action {
+        border-top: 0px !important;
+        background: #ffffff !important;
+    }
+    // .full-screen {
+    //     position: relative;
+    // }
     display: flex;
     padding: 30px 0px;
     .gojs-container{

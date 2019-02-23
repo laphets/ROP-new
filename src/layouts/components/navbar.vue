@@ -22,7 +22,7 @@
                         <span>短信账户余额: ￥{{smsBalance}} <br> 预计发送量: {{smsBalance/0.05}}条</span>
                     </template>
                     <!-- <a-badge :numberStyle= "{backgroundColor: '#3d91f7'}" class="message-badge" :count="smsBalance/0.05" :overflowCount="999"> -->
-                    <a-badge class="message-badge" :count="smsBalance/0.05" :overflowCount="999">
+                    <a-badge class="message-badge" :count="smsBalance/0.05" :overflowCount="2000">
                         <a-icon class="icon" type="message" />
                     </a-badge>
                 </a-tooltip>
