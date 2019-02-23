@@ -79,11 +79,11 @@
                     <a-form-item label="题目类型">
                         <a-select @change="handleCategoryChange" v-decorator="['category', {}]">
                             <a-select-option value="SELECT">选择题</a-select-option>
-                            <a-select-option value="TEXT">简答题</a-select-option>
+                            <a-select-option value="TEXT">文本提示</a-select-option>
                             <a-select-option value="TEXTAREA">论述题</a-select-option>
                             <a-select-option value="INPUT">输入框</a-select-option>
                             <a-select-option value="BOX">BOX</a-select-option>
-                            <a-select-option value="UPLOAD">上传文件</a-select-option>
+                            <a-select-option value="UPLOAD">文件上传</a-select-option>
                         </a-select>
                     </a-form-item>
                     <a-form-item label="选项个数" :style="{ display: choiceDisabled ? 'none' : 'block' }" >
