@@ -123,7 +123,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { setTimeout } from 'timers';
 let $ = go.GraphObject.make
-const typeMap: {[key: string]: string} = { 'TEXT': '简答题', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '上传文件', 'BOX': 'BOX', 'SELECT': '选择题' }
+const typeMap: {[key: string]: string} = { 'TEXT': '文本提示', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '文件上传', 'BOX': 'BOX', 'SELECT': '选择题' }
 const defaultPort = { id: 'B', 'text': '默认跳转' }
 @Component
 export default class InstancePageClass extends Vue {
