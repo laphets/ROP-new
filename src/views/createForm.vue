@@ -88,10 +88,10 @@
                             <a-select-option value="UPLOAD">文件上传</a-select-option>
                         </a-select>
                     </a-form-item>
-                    <a-form-item label="选项个数" :style="{ display: choiceDisabled ? 'none' : 'block' }" >
+                    <a-form-item label="选项个数" :style="{ display: choiceDisabled ? 'none' : 'block' }">
                         <a-input-number :min="0" :max="26" :initialValue="0" v-decorator="['choiceCount', {}]" />
                     </a-form-item>
-                    <a-form-item label="最多选择个数" :style="{ display: choiceDisabled ? 'none' : 'block' }" >
+                    <a-form-item label="最多选择个数" :style="{ display: choiceDisabled ? 'none' : 'block' }">
                         <a-input-number :min="0" :max="26" :initialValue="0" v-decorator="['available_cnt', {}]" />
                     </a-form-item>
                     <a-form-item label="是否必填">
@@ -109,6 +109,9 @@
                             <a-select-option value="DEPART">部门志愿选择</a-select-option>
                         </a-select>    
                     </a-form-item>
+                    <a-form-item label="正则表达式" :style="{ display: reDisabled ? 'none' : 'block' }">
+                        <a-input placeholder="无" v-decorator="['re', {}]" />
+                    </a-form-item>
                 </a-form>
             </a-modal>
         </div>
@@ -125,8 +128,8 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { setTimeout } from 'timers';
 let $ = go.GraphObject.make
-const typeMap: {[key: string]: string} = { 'TEXT': '文本提示', 'TEXTAREA': '论述题', 'INPUT': '输入框', 'UPLOAD': '文件上传', 'BOX': 'BOX', 'SELECT': '选择题' }
-const defaultPort = { id: 'B', 'text': '默认跳转' }
+const typeMap: {[key: string]: string} = { TEXT: '文本提示', TEXTAREA: '论述题', INPUT: '输入框', UPLOAD: '文件上传', BOX: 'BOX', SELECT: '选择题' }
+const defaultPort = { id: 'B', text: '默认跳转' }
 @Component
 export default class InstancePageClass extends Vue {
     formList = [{ name: '' }] as RawForm[]
@@ -139,6 +142,7 @@ export default class InstancePageClass extends Vue {
     editModalVisible = false
     form = {} as object
     choiceDisabled = false
+    reDisabled = false
     editIndex = -1
     confirmLoading = false
     fullScreen = false
@@ -147,7 +151,7 @@ export default class InstancePageClass extends Vue {
         const { data } = (await getFormList()).data
         this.formList = data
         this.renderList = []
-        data.forEach((item: RawForm)=> {
+        data.forEach((item: RawForm) => {
             this.renderList.push({ name: item.name, ID: item.ID, UpdatedAt: item.UpdatedAt })
         })
     }
@@ -184,7 +188,7 @@ export default class InstancePageClass extends Vue {
         const { nodeDataArray, linkDataArray } = this.diagram.model as go.GraphLinksModel
         const n = nodeDataArray.length
         let inDegree: number[] = new Array<number>(n)
-        let adjEdge: number[][] = new Array<Array<number>>(n)
+        let adjEdge: number[][] = new Array<number[]>(n)
         let queue: number[] = []
         nodeDataArray.forEach((item: any, index: number) => {
             inverseMap[item.key] = index
@@ -197,9 +201,9 @@ export default class InstancePageClass extends Vue {
             adjEdge[u].push(v)
         }
         inDegree.forEach((degree: number, vertex: number) => {
-            if (degree === 0) queue.push(vertex)
+            if (degree === 0) { queue.push(vertex) }
         })
-        if (queue.length > 1) return false
+        if (queue.length > 1) { return false }
         while (queue.length) {
             let u = queue[0]
             queue.shift()
@@ -209,8 +213,9 @@ export default class InstancePageClass extends Vue {
                 }
             }
         }
-        for (let degree of inDegree)
-            if (degree > 0) return false
+        for (let degree of inDegree) {
+            if (degree > 0) { return false
+        } }
         return true
     }
 
@@ -237,15 +242,16 @@ export default class InstancePageClass extends Vue {
                 text: item.text,
                 next: -1,
                 spec: item.spec,
-                required: item.required
+                required: item.required,
+                re: item.re
             }
             if (item.category === 'SELECT') {
                 let choices = [] as IChoice[]
                 for (let c of item.choices) {
-                    if (c.id === 'B') continue
+                    if (c.id === 'B') { continue }
                     choices.push({ tag: c.id, text: c.text, next: -1 })
                 }
-                data.push({ ... node, choices: choices, available_cnt: item.available_cnt })
+                data.push({ ... node, choices, available_cnt: item.available_cnt })
             } else {
                 data.push(node)
             }
@@ -255,8 +261,9 @@ export default class InstancePageClass extends Vue {
             const node = data[u - 1] as any
             if (e.fromPort === 'B') {
                 node.next = v
-                if (node.type === 'SELECT')
+                if (node.type === 'SELECT') {
                     node.default_jump = true
+                }
             } else {
                 const index = Number(e.fromPort) - 1
                 node.choices[index].next = v
@@ -276,7 +283,8 @@ export default class InstancePageClass extends Vue {
                 choices: [defaultPort] as object[],
                 spec: item.spec,
                 available_cnt: item.available_cnt,
-                required: item.required
+                required: item.required,
+                re: item.re
             }
             if (item.next !== -1) {
                 LArray.push({ from: item.tag, to: item.next, fromPort: 'B', toPort: 'T' })
@@ -358,7 +366,7 @@ export default class InstancePageClass extends Vue {
             'scrollsPageOnFocus': false,
             'undoManager.isEnabled': true,
             'grid.visible': false,
-            layout: $(go.TreeLayout, {
+            "layout": $(go.TreeLayout, {
                 angle: 90
             })
         })
@@ -370,17 +378,20 @@ export default class InstancePageClass extends Vue {
         diagram.addDiagramListener('ObjectDoubleClicked', async (e: any) => {
             if (e.subject.panel instanceof go.Node && e.subject.panel.data) {
                 (this as any).form.resetFields()
-                this.findIndex(e.subject.panel.data.key)
+                const { data } = e.subject.panel
+                this.findIndex(data.key)
                 this.editModalVisible = true
                 await setTimeout(() => {
                     (this as any).form.setFieldsValue({
-                        category: e.subject.panel.data.category,
-                        choiceCount: e.subject.panel.data.choices.length - 1,
-                        available_cnt: e.subject.panel.data.available_cnt || 0,
-                        spec: e.subject.panel.data.spec || 'NULL',
-                        required: e.subject.panel.data.required
+                        category: data.category,
+                        choiceCount: data.choices.length - 1,
+                        available_cnt: data.available_cnt || 0,
+                        spec: data.spec || 'NULL',
+                        required: data.required,
+                        re: data.re || ''
                     })
-                    this.choiceDisabled = (e.subject.panel.data.category !== 'SELECT')
+                    this.choiceDisabled = (data.category !== 'SELECT')
+                    this.reDisabled = (data.category === 'UPLOAD' || data.category === 'BOX' || data.category === 'SELECT')
                 }, 100)
             }
         })
@@ -538,12 +549,12 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'TEXTAREA', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'INPUT', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'UPLOAD', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'BOX', text:'请输入问题', choices: [defaultPort] },
-                    { category: 'SELECT', text:'请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1 }
+                    { category: 'TEXT', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'TEXTAREA', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'INPUT', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'UPLOAD', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'BOX', text: '请输入问题', choices: [defaultPort] },
+                    { category: 'SELECT', text: '请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1 }
                 ])
             }
         )
@@ -569,7 +580,7 @@ export default class InstancePageClass extends Vue {
                     this.confirmLoading = false
                     this.createModalVisible = false
                     successMessage('创建成功')
-                } catch(err) {
+                } catch (err) {
                     console.log(err)
                 }
             }
@@ -591,7 +602,7 @@ export default class InstancePageClass extends Vue {
             const { model } = this.diagram
             model.nodeDataArray = await JSON.parse(JSON.stringify(model.nodeDataArray))
             const node = model.nodeDataArray[this.editIndex] as any
-            if (! node) return
+            if (! node) { return }
             if (values.category) {
                 node.category = `${values.category}`
             }
@@ -600,10 +611,12 @@ export default class InstancePageClass extends Vue {
             }
             if (values.choiceCount >= 0) {
                 const { choices } = node
-                while (choices.length - 1 < values.choiceCount)
+                while (choices.length - 1 < values.choiceCount) {
                     choices.push({ id: choices.length, text: '' })
-                while (choices.length - 1 > values.choiceCount)
+                }
+                while (choices.length - 1 > values.choiceCount) {
                     choices.pop()
+                }
             }
             if (values.available_cnt) {
                 node.available_cnt = values.available_cnt
@@ -612,6 +625,9 @@ export default class InstancePageClass extends Vue {
                 node.spec = values.spec
             }
             node.required = values.required
+            if (values.re && values.re !== '') {
+                node.re = values.re
+            }
             await this.diagram.rebuildParts()
         })
         this.editModalVisible = false
@@ -623,6 +639,7 @@ export default class InstancePageClass extends Vue {
 
     handleCategoryChange(value: string) {
         this.choiceDisabled = (value !== 'SELECT')
+        this.reDisabled = (value === 'UPLOAD' || value === 'BOX' || value === 'SELECT')
     }
 
     async handleSave() {
