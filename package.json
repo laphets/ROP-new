@@ -12,6 +12,7 @@
         "ant-design-vue": "^1.3.4",
         "axios": "^0.18.0",
         "fuckgojs": "2.0.0",
+        "jr-qrcode": "^1.1.4",
         "moment": "^2.22.2",
         "npm": "^6.6.0",
         "query-string": "^6.1.0",
