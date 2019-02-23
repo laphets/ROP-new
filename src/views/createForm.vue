@@ -88,10 +88,10 @@
                             <a-select-option value="UPLOAD">文件上传</a-select-option>
                         </a-select>
                     </a-form-item>
-                    <a-form-item label="选项个数" :style="{ display: choiceDisabled ? 'none' : 'block' }" >
+                    <a-form-item label="选项个数" :style="{ display: choiceDisabled ? 'none' : 'block' }">
                         <a-input-number :min="0" :max="26" :initialValue="0" v-decorator="['choiceCount', {}]" />
                     </a-form-item>
-                    <a-form-item label="最多选择个数" :style="{ display: choiceDisabled ? 'none' : 'block' }" >
+                    <a-form-item label="最多选择个数" :style="{ display: choiceDisabled ? 'none' : 'block' }">
                         <a-input-number :min="0" :max="26" :initialValue="0" v-decorator="['available_cnt', {}]" />
                     </a-form-item>
                     <a-form-item label="是否必填">
@@ -108,6 +108,9 @@
                             <a-select-option value="PHOTO">生活照</a-select-option>
                             <a-select-option value="DEPART">部门志愿选择</a-select-option>
                         </a-select>    
+                    </a-form-item>
+                    <a-form-item label="正则表达式" :style="{ display: reDisabled ? 'none' : 'block' }">
+                        <a-input placeholder="无" v-decorator="['re', {}]" />
                     </a-form-item>
                 </a-form>
             </a-modal>
@@ -139,6 +142,7 @@ export default class InstancePageClass extends Vue {
     editModalVisible = false
     form = {} as object
     choiceDisabled = false
+    reDisabled = false
     editIndex = -1
     confirmLoading = false
     fullScreen = false
@@ -237,7 +241,8 @@ export default class InstancePageClass extends Vue {
                 text: item.text,
                 next: -1,
                 spec: item.spec,
-                required: item.required
+                required: item.required,
+                re: item.re
             }
             if (item.category === 'SELECT') {
                 let choices = [] as IChoice[]
@@ -276,7 +281,8 @@ export default class InstancePageClass extends Vue {
                 choices: [defaultPort] as object[],
                 spec: item.spec,
                 available_cnt: item.available_cnt,
-                required: item.required
+                required: item.required,
+                re: item.re
             }
             if (item.next !== -1) {
                 LArray.push({ from: item.tag, to: item.next, fromPort: 'B', toPort: 'T' })
@@ -370,17 +376,20 @@ export default class InstancePageClass extends Vue {
         diagram.addDiagramListener('ObjectDoubleClicked', async (e: any) => {
             if (e.subject.panel instanceof go.Node && e.subject.panel.data) {
                 (this as any).form.resetFields()
-                this.findIndex(e.subject.panel.data.key)
+                const { data } = e.subject.panel
+                this.findIndex(data.key)
                 this.editModalVisible = true
                 await setTimeout(() => {
                     (this as any).form.setFieldsValue({
-                        category: e.subject.panel.data.category,
-                        choiceCount: e.subject.panel.data.choices.length - 1,
-                        available_cnt: e.subject.panel.data.available_cnt || 0,
-                        spec: e.subject.panel.data.spec || 'NULL',
-                        required: e.subject.panel.data.required
+                        category: data.category,
+                        choiceCount: data.choices.length - 1,
+                        available_cnt: data.available_cnt || 0,
+                        spec: data.spec || 'NULL',
+                        required: data.required,
+                        re: data.re || ''
                     })
-                    this.choiceDisabled = (e.subject.panel.data.category !== 'SELECT')
+                    this.choiceDisabled = (data.category !== 'SELECT')
+                    this.reDisabled = (data.category === 'UPLOAD' || data.category === 'BOX' || data.category === 'SELECT')
                 }, 100)
             }
         })
@@ -612,6 +621,9 @@ export default class InstancePageClass extends Vue {
                 node.spec = values.spec
             }
             node.required = values.required
+            if (values.re && values.re != '') {
+                node.re = values.re
+            }
             await this.diagram.rebuildParts()
         })
         this.editModalVisible = false
@@ -623,6 +635,7 @@ export default class InstancePageClass extends Vue {
 
     handleCategoryChange(value: string) {
         this.choiceDisabled = (value !== 'SELECT')
+        this.reDisabled = (value === 'UPLOAD' || value === 'BOX' || value === 'SELECT')
     }
 
     async handleSave() {
