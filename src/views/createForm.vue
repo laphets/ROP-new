@@ -121,6 +121,7 @@
 <script lang="ts">
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import go, { DraggingTool, Diagram, GraphLinksModel } from 'fuckgojs';
+import screenfull from 'screenfull';
 import { RawForm, IForm, INode, IChoice } from '@/interfaces/form.interface';
 import { getFormList, updateForm, createForm } from '@/api/form';
 import { successMessage, errorMessage } from '@/utils/message';
@@ -166,14 +167,10 @@ export default class InstancePageClass extends Vue {
     }
 
     handleFullscreen() {
-        if (this.fullScreen) {
-            this.fullScreen = false;
-            (this.$refs['gojs-container'] as any).exitFullscreen()
-        } else {
-            this.fullScreen = true;
-            (this.$refs['gojs-container'] as any).webkitRequestFullscreen()
+        if (screenfull) {
+            screenfull.toggle(this.$refs['gojs-container'] as Element)
+            this.fullScreen = !this.fullScreen
         }
-
     }
 
     createEmptyModel() {
@@ -560,6 +557,22 @@ export default class InstancePageClass extends Vue {
         )
 
         this.diagram = diagram
+
+        //check fullscreen
+        const checkfull = () => {
+            const doc = document as any
+            let isFull = doc.fullscreenEnabled || (window as any).fullScreen || doc.webkitIsFullScreen || doc.msFullscreenEnabled
+            if (isFull === undefined) {
+                isFull = false
+            }
+            return isFull
+        }
+
+        window.onresize = () => {
+            if (! checkfull()) {
+                this.fullScreen = false
+            }
+        }
     }
 
     handleClear() {
