@@ -708,11 +708,6 @@
     error-stack-parser "^2.0.0"
     string-width "^2.0.0"
 
-"@types/go@^1.6.20":
-  version "1.6.20"
-  resolved "https://registry.yarnpkg.com/@types/go/-/go-1.6.20.tgz#c2b4fdf6f051b6805937e9c07bc44456d6f1181f"
-  integrity sha512-U4DmqYRMEr3gOmF7DMMYJj9lvAdF5aJLgq0CnNh7fh13JCtXO3BLDNX2n4pyY2ZNa2ZGm++KrYMS63J4W+Kn5A==
-
 "@types/node@^10.12.19":
   version "10.12.19"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.19.tgz#ca1018c26be01f07e66ac7fefbeb6407e4490c61"
@@ -727,6 +722,11 @@
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/@types/query-string/-/query-string-6.1.1.tgz#1cfd9209c8dbd91b940192c8a2b7005d2a743e6f"
   integrity sha512-wRUeF7KN2yxCMw4VoXzPh3GWStbGaiyVjyX22fG7mpSzt6etLvsA2S0g0IuGeXGwVNIlztzVmGP6AxZMmYTQhw==
+
+"@types/screenfull@^3.3.2":
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/@types/screenfull/-/screenfull-3.3.2.tgz#2425ed1ff1c70913e40c622c31b9b3b51701c9f9"
+  integrity sha512-2mdZgaFDd1+qJDOw3RlBnVNucwt3xnHEkKmoIpSBmLr9QzVW2EOwmQnPmUf/MfCx2JVGu1Lq7vDVfML/mioFmA==
 
 "@types/socket.io-client@^1.4.32":
   version "1.4.32"
@@ -7939,6 +7939,11 @@ schema-utils@^1.0.0:
     ajv "^6.1.0"
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
+
+screenfull@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/screenfull/-/screenfull-4.0.1.tgz#f3c13c41eb852cd29a63b01cf6e02a4fede137e2"
+  integrity sha512-9Poi+mjYVWbMFtt7JFGvXo9r/HVo2eweKnmAFQ0A++YjoCKaErDbvLjwtTF7Slazdx9K7VCxqWbNn22V2a1J/g==
 
 select-hose@^2.0.0:
   version "2.0.0"
