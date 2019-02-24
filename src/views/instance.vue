@@ -25,16 +25,36 @@
                     
                     <ul class="ant-card-actions opt-panel" slot="actions">
                         <li style="width: 33.33%;">
-                            <a-dropdown placement="bottomCenter">
-                                <div>
+                            <!-- <a-dropdown placement="bottomCenter"> -->
+                                <a-popover placement="bottom" trigger="hover">
+                                    <template slot="content">
+                                        <div class="link-container">
+                                            <div>
+                                                <a target="_blank" :href="`https://rop.zjuqsc.com/submit?instanceId=${item.ID}`">{{`https://rop.zjuqsc.com/submit?instanceId=${item.ID}`}}</a>
+                                            </div>
+                                            <div class="image-container">
+                                                <img :src="getQrcode(item.ID)">
+                                            </div>
+                                        </div>
+
+                                    
+                                    </template>
+                                    <div>
+                                        查看链接 <a-icon type="link" />
+                                    </div>
+                                </a-popover>
+
+
+                                <!-- <div>
                                 配置 <a-icon type="down" />
                                 </div>
                                 <a-menu slot="overlay" @click="onClick">
 
                                 <a-menu-item key="3">更改信息</a-menu-item>
                                 <a-menu-item key="4" style="color: #ff4949;">删除实例</a-menu-item>
-                                </a-menu>
-                            </a-dropdown></li>
+                                </a-menu> -->
+                            <!-- </a-dropdown> -->
+                        </li>
                         <li style="width: 33.33%;">
                             <a-dropdown placement="bottomCenter">
                                 <a class="ant-dropdown-link" href="#">
@@ -159,6 +179,8 @@ import 'moment/locale/zh-cn';
 import { getInstanceList, createInstance, updateInstance } from '@/api/instance'
 import { getFormList } from '@/api/form'
 import { successMessage } from '@/utils/message';
+const jrQrcode = require('jr-qrcode');
+
 @Component
 export default class InstancePageClass extends Vue {
     objStyle = {
@@ -184,6 +206,11 @@ export default class InstancePageClass extends Vue {
     async created() {
         const { data } = (await getInstanceList()).data
         this.instanceList = data
+
+    }
+
+    getQrcode(instanceId: number) {
+        return jrQrcode.getQrBase64(`https://rop.zjuqsc.com/submit?instanceId=${instanceId}`)
     }
 
     onClick() {
@@ -228,6 +255,12 @@ export default class InstancePageClass extends Vue {
 <style lang="less" scoped>
 .page-container {
     padding: 45px 56px;
+}
+.link-container {
+    .image-container {
+        display: flex;
+        justify-content: center;
+    }
 }
 .card {
     margin-bottom: 20px;
