@@ -138,11 +138,21 @@
                 </a-form-item>
 
                 <a-form-item
+                label='面试场地'
+                :labelCol="{ span: 5 }"
+                :wrapperCol="{ span: 12 }"
+                fieldDecoratorId="location"
+                :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入面试场地' }]}"
+                >
+                <a-input />
+                </a-form-item>
+
+                <a-form-item
                 label='面试官'
                 :labelCol="{ span: 5 }"
                 :wrapperCol="{ span: 12 }"
                 fieldDecoratorId="interviewers"
-                :fieldDecoratorOptions="{rules: [{ required: false, message: '请输入所有的面试官' }]}"
+                :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入所有的面试官' }]}"
                 >
                 <a-input />
                 </a-form-item>
