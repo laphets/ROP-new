@@ -255,6 +255,8 @@ export default class InstancePageClass extends Vue {
 <style lang="less" scoped>
 .page-container {
     padding: 45px 56px;
+    display: flex;
+    flex-direction: column;
 }
 .link-container {
     .image-container {
