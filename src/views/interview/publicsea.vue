@@ -31,7 +31,13 @@
             <div>
                 <div v-for="(item, index) in modal_content.other_info" :key="index">
                     <strong>{{item.key}}: </strong>
-                    {{item.value}}
+                    <span v-if="item.value!==modal_content.photo">{{item.value}}</span>
+                    <a-popover v-else :title="`${modal_content.name}的照片`">
+                        <template slot="content">
+                            <img style="width: 300px;" :src="modal_content.photo"/>
+                        </template>
+                        <a-tag color="cyan">查看照片</a-tag>
+                    </a-popover>
                 </div>
                 
             </div>
