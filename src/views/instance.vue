@@ -1,6 +1,7 @@
 <template>
     <div class="page-container">
-        <a-row :gutter="20">
+        <a-spin v-if="loading" style="margin-top: 30vh;" size="large" />
+        <a-row v-else :gutter="20">
             <a-col v-for="(item, index) in instanceList" :key="item.ID" :span="8" 
             :xs="24" :sm="24" :md="24" :lg="12" :xl="8">
                 <div
@@ -190,6 +191,7 @@ export default class InstancePageClass extends Vue {
     instanceList = []
     submitLoading = false;
     formList = []
+    loading = true
     prase_time(time: string) {
         return moment(new Date(time)).format('LLL')
     }
@@ -206,6 +208,7 @@ export default class InstancePageClass extends Vue {
     async created() {
         const { data } = (await getInstanceList()).data
         this.instanceList = data
+        this.loading = false
 
     }
 

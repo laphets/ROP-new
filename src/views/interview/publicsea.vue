@@ -1,6 +1,6 @@
 <template>
     <div class="list-container">
-        <a-table :columns="columns" :dataSource="data" :scroll="{ x: 1400, y: 450 }">
+        <a-table :columns="columns" :dataSource="data" :scroll="{ x: 1400, y: 450 }" :loading="loading">
                 <span slot="action" slot-scope="text, record">
                     <a @click="showInfo(record)" >查看信息</a>
                     <a-divider type="vertical" />                    
@@ -122,6 +122,7 @@ export default class PublicSeaClass extends Vue {
         },
     ];
     data: any = []
+    loading = true
     async created() {
         const substage_map = ['未知', '未分配', '已分配未确认']
         this.data = ((await intentAPI.getIntentList({mainStage: 'Public Sea', department: this.$route.name})).data).data.map((item: any) => {
@@ -137,6 +138,7 @@ export default class PublicSeaClass extends Vue {
                 target_interview_str: tmp_str
             }
         })
+        this.loading = false
     }
 
     checkGroupVisible = false

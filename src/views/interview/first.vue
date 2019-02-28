@@ -11,12 +11,12 @@
                     >
                     <div class="main">
                         <a-card-meta
-                            :title="`${item.name}${item.auto_joinable==1 ? '' : '  (保留场次)'} ${item.not_available == 1 ? '(停用)' : ''}`"
+                            :title="`${item.not_available == 1 ? '[停用]' : ''} ${item.name}${item.auto_joinable==1 ? '' : '  (保留场次)'}`"
                         >
                         </a-card-meta>
                         <div class="card-body">
                             <div class="first">编号: &nbsp&nbsp&nbsp {{item.ID}}</div>
-                            <div>部门: &nbsp&nbsp&nbsp  {{item.department}}</div>
+                            <div>地点: &nbsp&nbsp&nbsp  {{item.location}}</div>
                             <div>主面试官: &nbsp&nbsp&nbsp {{item.director}}</div>
                             <div>时间: &nbsp&nbsp&nbsp <a-icon type="clock-circle-o" />&nbsp{{prase_time(item.start_time)}} </div>
                             <div class="status">
