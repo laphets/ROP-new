@@ -11,7 +11,7 @@
                     >
                     <div class="main">
                         <a-card-meta
-                            :title="`${item.name}${item.auto_joinable==1 ? '' : '  (保留场次)'}`"
+                            :title="`${item.name}${item.auto_joinable==1 ? '' : '  (保留场次)'} ${item.not_available == 1 ? '(停用)' : ''}`"
                         >
                         </a-card-meta>
                         <div class="card-body">
@@ -35,8 +35,18 @@
                     </div>
                     
                     <ul class="ant-card-actions" slot="actions">
-                        <li style="width: 33.3333%;">面试管理</li>
                         <li style="width: 33.3333%;">面试者查看</li>
+                        <li style="width: 33.3333%;">
+                            <a-dropdown placement="bottomCenter">
+                                <a class="ant-dropdown-link" href="#">
+                                操作 <a-icon type="poweroff" />
+                                </a>
+                                <a-menu slot="overlay">
+                                <a-menu-item  @click="enable(item.ID)" key="1" style="color: #43A047;">开放面试</a-menu-item>
+                                <a-menu-item  @click="disable(item.ID)" key="2" style="color: #ff4949;">停止面试</a-menu-item>
+                                </a-menu>
+                            </a-dropdown>
+                        </li>
                         <li @click="openChat(item)" style="width: 33.3333%;">面试交流</li>
                     </ul>
 
@@ -77,7 +87,7 @@
 <script lang="ts">
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { getInterviewList } from '@/api/interview'
+import { getInterviewList, enableInterview, disableInterview } from '@/api/interview'
 import { getIntentList, assign } from '@/api/intent'
 import * as intentAPI from '@/api/intent'
 
@@ -114,6 +124,31 @@ export default class FirstClass extends Vue {
             return '尚未开始'
         } else {
             return '已结束'
+        }
+    }
+
+    async enable(id: any) {
+        try {
+            await enableInterview(id)
+            successMessage('面试开启成功')
+            this.interviewList = ((await getInterviewList({
+                interview_type: 1,
+                department: this.$route.name
+            })).data).data
+        } catch (error) {
+
+        }
+    }
+    async disable(id: any) {
+        try {
+            await disableInterview(id)
+            successMessage('面试停止成功')
+            this.interviewList = ((await getInterviewList({
+                interview_type: 1,
+                department: this.$route.name
+            })).data).data
+        } catch (error) {
+
         }
     }
 
