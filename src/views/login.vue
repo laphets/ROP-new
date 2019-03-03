@@ -125,10 +125,18 @@ import store from '@/store';
 const HOST = process.env.VUE_APP_HOST as string
 
 @Component
-export default class RedirectPageClass extends Vue {
+export default class LoginPageClass extends Vue {
     associationList = []
     redirect = ""
     async created() {
+        if (db.token.get()) {
+            try {
+                await store.dispatch('GetUserInfo') 
+                window.location.href = `${HOST}/index`
+            } catch (error) {
+                
+            }
+        }
         const { data } = (await getAssociation()).data
         this.associationList = data;
         this.redirect = this.$route.query.redirect as string

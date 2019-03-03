@@ -63,6 +63,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Getter } from 'vuex-class'
 import { errorMessage, successMessage, showNotice } from '@/utils/message';
 
+const HOST = process.env.VUE_APP_HOST as string
 
 @Component
 export default class NavbarClass extends Vue {
@@ -89,8 +90,7 @@ export default class NavbarClass extends Vue {
     meToogle({ key }: any) {
         if (key === '3') {
             this.$store.dispatch('Logout')
-            this.$router.push('/login')
-            // window.location.href = `https://passport.zjuqsc.com/logout`
+            window.location.href = `${HOST}/login`
         }
     }
 
