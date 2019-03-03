@@ -96,7 +96,7 @@ export default class NavbarClass extends Vue {
         if (!this.instanceName) {
             showNotice('info', '尚未选择纳新实例', `请在"查看纳新"页面选择你所需要查看的纳新实例`)
         }
-        showNotice('warning', '系统更新提示', `我们将于今日(Mar 3)下午对系统后台进行大规模更新，届时可能会出现短暂的响应延迟或无法完成数据请求,请勿慌张😈`, 10)
+        showNotice('warning', '系统更新提示', `我们将于今日(Mar 3)下午对系统后台进行大规模更新，届时可能会出现短暂的响应延迟或无法完成数据请求或要求重新登录的现象,请各位潮人广而告之并且不要慌张😈`, 10)
     }
 }
 </script>
