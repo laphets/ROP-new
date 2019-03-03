@@ -20,9 +20,12 @@ export const loadMessage = (errmsg: string | any): void => {
     message.load(errmsg)
 }
 
-export const showNotice = (type: string, title: string, description: string) => {
+export const showNotice = (type: string, title: string, description: string, duration = 4.5) => {
     notification[type]({
         message: title,
         description,
+        placement: 'bottomRight',
+        duration
     });
 }
+
