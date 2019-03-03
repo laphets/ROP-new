@@ -80,6 +80,8 @@ import { successMessage, errorMessage } from '@/utils/message';
 
 import db from '@/utils/db';
 
+const HOST = process.env.VUE_APP_HOST as string
+
 @Component
 export default class RedirectPageClass extends Vue {
     data = {
@@ -115,7 +117,8 @@ export default class RedirectPageClass extends Vue {
                 })).data
                 successMessage('用户注册成功')
                 db.token.set(`Bearer ${data}`)
-                this.$router.push('/index')
+                window.location.href = `${HOST}/index`
+                // this.$router.push('/index')
             } catch (error) {
                 errorMessage('用户注册失败')
             }
