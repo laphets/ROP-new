@@ -1,5 +1,5 @@
 <template>
-    <div class="page-container">
+    <div class="createform-page-container">
 
         <div class="form-container">
             <a-input-search
@@ -681,7 +681,7 @@ canvas {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0) !important; /* mobile webkit */
 }
 
-.page-container{
+.createform-page-container{
     .action {
         border-top: 0px !important;
         background: #ffffff !important;
