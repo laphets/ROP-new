@@ -6,6 +6,8 @@ import { MyRouteConfig } from '@/interfaces/router.interface';
 // import Home from '@/layouts/index.vue';
 
 const Page404: AsyncComponent = (): any => import('@/views/404.vue')
+const Login: AsyncComponent = (): any => import('@/views/login.vue')
+const Register: AsyncComponent = (): any => import('@/views/register.vue')
 const Redirect: AsyncComponent = (): any => import('@/views/redirect.vue')
 
 
@@ -24,6 +26,18 @@ const AssociationManage: AsyncComponent = (): any => import('@/views/association
 export const constantRoutes: MyRouteConfig[] = [
     {
         path: '/login',
+        name: 'login',
+        component: Login,
+        hidden: true
+    },
+    {
+        path: '/register',
+        name: 'register',
+        component: Register,
+        hidden: true
+    },
+    {
+        path: '/redirect',
         name: 'redirect',
         component: Redirect,
         hidden: true

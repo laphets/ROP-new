@@ -155,7 +155,7 @@
                 >
                 <a-input />
                 </a-form-item>
-                <a-form-item
+                <!-- <a-form-item
                 label='创建组织'
                 :labelCol="{ span: 5 }"
                 :wrapperCol="{ span: 12 }"
@@ -163,7 +163,7 @@
                 :fieldDecoratorOptions="{rules: [{ required: false, message: '请输入纳新实例的备注' }]}"
                 >
                 <a-input />
-                </a-form-item>
+                </a-form-item> -->
                 <a-form-item
                 :wrapperCol="{ span: 12, offset: 5 }"
                 >

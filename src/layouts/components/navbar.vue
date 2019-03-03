@@ -38,8 +38,8 @@
                 <a-dropdown>
                 <div class="user-profile-body">
                     <img v-if="avatar" class="user-avatar" :src="avatar">
-                    <a-avatar v-else class="user-avatar-a" slot="avatar" :style="{backgroundColor: '#7265e6', verticalAlign: 'middle'}"> {{innerId[0]}} </a-avatar>
-                    <span class="user-name">{{department}}  {{innerId}}</span>
+                    <a-avatar v-else class="user-avatar-a" slot="avatar" :style="{backgroundColor: '#7265e6', verticalAlign: 'middle'}"> {{innerId? innerId[0] : name[0]}} </a-avatar>
+                    <span class="user-name">{{department}}  {{innerId? innerId: name}}</span>
                 </div>
                 <a-menu class="user-dropdown" slot="overlay" @click="meToogle">
                     <a-menu-item key="1">
@@ -68,6 +68,7 @@ import { errorMessage, successMessage, showNotice } from '@/utils/message';
 export default class NavbarClass extends Vue {
     @Getter('department') department!: string;
     @Getter('innerId') innerId!: string;
+    @Getter('name') name!: string;
     @Getter('instanceName') instanceName!: string;
     @Getter('avatar') avatar!: string;
     @Getter('smsBalance') smsBalance!: number;

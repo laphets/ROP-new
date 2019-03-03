@@ -1,6 +1,9 @@
 <template>
     <div class="association-page">
         <div class="container">
+            <div class="opt-container">
+                <a-button @click="showModal()">添加用户</a-button>
+            </div>
             <a-skeleton active :loading="loading">
                 <a-list
                     class="loadmore-list"
@@ -16,10 +19,10 @@
                     <a slot="actions">管理</a>
                     <a slot="actions">更多</a>
                     <a-list-item-meta
-                        :description="`${item.department} - Last Seen: ${get_relative_time(item.last_seen)}`"
+                        :description="`${item.association_name}-${item.department} - Last Seen: ${get_relative_time(item.last_seen)}`"
                     >
-                        <a slot="title" href="#">{{item.inner_id}}</a>
-                            <a-avatar v-if="!item.avatar" slot="avatar" :style="{backgroundColor: colorList[index % colorList.length], verticalAlign: 'middle'}"> {{item.inner_id[0]}} </a-avatar>
+                        <a slot="title" href="#">{{item.inner_id ? item.inner_id : item.name}}</a>
+                            <a-avatar v-if="!item.avatar" slot="avatar" :style="{backgroundColor: colorList[index % colorList.length], verticalAlign: 'middle'}"> {{item.inner_id ? item.inner_id[0] : item.name[0]}} </a-avatar>
                             <a-avatar v-else slot="avatar" :src="item.avatar" :style="{ verticalAlign: 'middle'}"> </a-avatar>
 
                     </a-list-item-meta>
@@ -27,24 +30,39 @@
                     </a-list-item>
                 </a-list>
             </a-skeleton>
+            <AdduserModal
+                ref="collectionForm"
+                :visible="visible"
+                @cancel="handleCancel"
+                @create="handleCreate"
+            />
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { getUserList } from '@/api/association';
+import { getUserList, addUser } from '@/api/association';
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 
-@Component
+import AdduserModal from './components/adduser.vue'
+
+import { successMessage, errorMessage } from '@/utils/message';
+
+@Component({
+    components: {
+        AdduserModal
+    }
+})
 export default class AssociationManagePageClass extends Vue {
     loading = true;
     data = [];
     colorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae']
     loadingMore = false;
     showLoadingMore = true;
+    visible = false;
 
     get_relative_time(time: string) {
         return time === '0001-01-01T00:00:00Z' ? '很久以前' : moment(new Date(time)).fromNow()
@@ -54,6 +72,37 @@ export default class AssociationManagePageClass extends Vue {
         const { data } = (await getUserList()).data
         this.loading = false;
         this.data = data;
+    }
+
+    async initData() {
+        const { data } = (await getUserList()).data
+        this.data = data;
+    }
+
+    showModal() {
+        this.visible = true;
+    }
+    handleCancel() {
+      this.visible = false;
+    }
+    handleCreate() {
+      const form = (this.$refs.collectionForm as any).form;
+      form.validateFields(async (err: any, values: any) => {
+        if (err) {
+          return;
+        }
+
+        try {
+            const data = await addUser(values)
+            this.initData()
+            successMessage('用户创建成功')
+            form.resetFields();
+            this.visible = false;
+        } catch (error) {
+            errorMessage('用户创建失败')
+            return
+        }
+      });
     }
 }
 </script>

@@ -2,7 +2,7 @@
  * @Author: Laphets 
  * @Date: 2018-07-12 10:44:04 
  * @Last Modified by: Laphets
- * @Last Modified time: 2019-02-22 23:46:46
+ * @Last Modified time: 2019-03-03 14:42:02
  */
 
 import { Getter, GetterTree } from 'vuex';
@@ -18,6 +18,7 @@ interface CombineState {
 }
 
 export default {
+    userId: state => state.user.userId,
     ZJUid: state => state.user.ZJUid,
     name: state => state.user.name,
     innerId: state => state.user.innerId,
@@ -27,5 +28,8 @@ export default {
     instancdId: state => state.app.instanceId,
     instanceName: state => state.app.instanceName,
     routers: state => state.router.routers,
-    smsBalance: state => state.user.smsBalance
+    smsBalance: state => state.user.smsBalance,
+    adminLevel: state => state.user.admin_level,
+    associationName: state => state.user.association_name,
+    departmentList: state => state.user.departmentList,
 } as MyGetterTree<CombineState, any>

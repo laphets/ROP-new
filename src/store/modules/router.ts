@@ -6,6 +6,7 @@ import { AsyncComponent } from 'vue';
 import { RouteConfig } from 'vue-router';
 import { RouterState } from '@/store/modules/interfaces/router.interface';
 
+import store from '@/store';
 
 const router = {
     state: {
@@ -19,9 +20,10 @@ const router = {
         }
     },
     actions: {
-        async GenerateRouters({ commit, state }, departments) {
-            const { data } = (await getDepartmentList()).data
-            const { department } = data
+        async GenerateRouters({ commit, state, rootState }, departments) {
+            // const { data } = (await getDepartmentList()).data
+            // const { department } = data
+            const department = rootState.user.departmentList.split('&')
             const Interview: AsyncComponent = (): any => import('@/views/interview/index.vue')
             
             const associationRouters = [] as RouteConfig[]

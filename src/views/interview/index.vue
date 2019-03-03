@@ -181,9 +181,9 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import firstInterview from './first.vue'
 import publicSea from './publicsea.vue'
 
-import { getDepartmentList } from '@/api/association'
-import { createInterview } from '@/api/interview'
 
+import { createInterview } from '@/api/interview'
+import { Getter } from 'vuex-class'
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 
@@ -196,6 +196,7 @@ import { successMessage } from '@/utils/message';
     }
 })
 export default class InterviewPageClass extends Vue {
+    @Getter('departmentList') departmentString!: string;
     moment = moment
     mode = "card"
     curView = 0
@@ -216,11 +217,11 @@ export default class InterviewPageClass extends Vue {
         this.curView = target
     }
 
-    departmentList = []
+    departmentList = [] as string[]
 
     createGroupVisable = false
     async showCreateGroup() {
-        this.departmentList = (((await getDepartmentList()).data).data).department
+        this.departmentList = this.departmentString.split('&')
         this.createGroupVisable = true
     }
 

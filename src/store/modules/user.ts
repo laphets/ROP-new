@@ -1,19 +1,27 @@
 import {Store, Module, Mutation, MutationTree, ActionTree} from 'vuex';
 import { UserState } from '@/store/modules/interfaces/user.interface';
 import db from '@/utils/db';
-import { login, getUserInfo, getSMSInfo } from '@/api/user';
+import { loginByQSC, getUserInfo, getSMSInfo } from '@/api/user';
 
 export default {
     state: {
+        userId: 0,
         ZJUid: '',
         name: '',
         innerId: '',
+        association_id: 0,
+        association_name: '',
+        admin_level: 0,
         department: '',
         avatar: '',
         token: db.token.get(),
         smsBalance: 0,
+        departmentList: '',
     },
     mutations: {
+        SET_USERID: (state, userId) => {
+            state.userId = userId
+        },
         SET_ZJUID: (state, ZJUid) => {
             state.ZJUid = ZJUid
         },
@@ -35,13 +43,24 @@ export default {
         },
         SET_SMSBALANCE: (state, balance) => {
             state.smsBalance = balance;
+        },
+        SET_DEPARTMENTLIST: (state, list) => {
+            state.departmentList = list;
+        },
+        SET_ASSOCIATIONID: (state, id) => {
+            state.association_id = id;
+        },
+        SET_ASSOCIATIONNAME: (state, name) => {
+            state.association_name = name;
+        },
+        SET_ADMINLEVEL: (state, level) => {
+            state.admin_level = level;
         }
     },
     actions: {
         async Login({ commit }): Promise<any> {
             try {
-                const { data } = await login()
-                console.log(data)
+                const { data } = await loginByQSC()
                 commit('SET_TOKEN', `Bearer ${data.data}`)
                 return
             } catch (error) {
@@ -57,14 +76,20 @@ export default {
         },
         async GetUserInfo({ commit, state }) {
             try {
-                const { ZJUid, name, inner_id, department, avatar } = ((await getUserInfo()).data).data
+                const { ZJUid, name, inner_id, department, avatar, id, association, admin_level } = ((await getUserInfo()).data).data
                 const { data: SMSRes } = await getSMSInfo()
+                commit('SET_USERID', id)
                 commit('SET_ZJUID', ZJUid)
                 commit('SET_NAME', name)
                 commit('SET_INNERID', inner_id)
                 commit('SET_DEPARTMENT', department)
                 commit('SET_AVATAR', avatar)
                 commit('SET_SMSBALANCE', SMSRes.data.balance)
+                commit('SET_DEPARTMENTLIST', association.department_list)
+                commit('SET_ASSOCIATIONID', association.ID)
+                commit('SET_ASSOCIATIONNAME', association.name)
+                commit('SET_ADMINLEVEL', admin_level)
+
                 return { ZJUid, name, inner_id, department }
             } catch (error) {
                 return Promise.reject(error)

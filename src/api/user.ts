@@ -1,8 +1,16 @@
 import request from '@/utils/request'
 import { UserInfoResponse } from '@/api/interfaces/user.interface';
 
-export const login = () => {
-    return request.post('v1/auth/login')
+export const loginByQSC = () => {
+    return request.post('v1/auth/login/qsc')
+}
+
+export const loginByPasswd = (data: any) => {
+    return request.post('v1/auth/login/passwd', data)
+}
+
+export const getAssociation = () => {
+    return request.get('v1/auth/association')
 }
 
 export const getUserInfo = () => {
