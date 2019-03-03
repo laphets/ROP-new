@@ -89,7 +89,8 @@ export default class NavbarClass extends Vue {
     meToogle({ key }: any) {
         if (key === '3') {
             this.$store.dispatch('Logout')
-            window.location.href = `https://passport.zjuqsc.com/logout`
+            this.$router.push('/login')
+            // window.location.href = `https://passport.zjuqsc.com/logout`
         }
     }
 

@@ -2,13 +2,14 @@
     <div class="register-page">
         <div class="main">
             <div class="desc-container">
-                <h1>{{data.association.name}}纳新</h1>
+                <h1 v-if="!error">{{data.association.name}}纳新</h1>
+                <h1 v-else>链接已经失效</h1>
                 <!-- <h1>求是潮纳新开放平台</h1> -->
-                <div class="desc">
+                <div v-if="!error" class="desc">
                     {{data.name}}同学您好，接下来请为您的账户设置密码并填写相关信息
                 </div>
             </div>
-            <div class="form-container">
+            <div v-if="!error" class="form-container">
                 <a-form
                     id="components-form-demo-normal-login"
                     :form="form"
@@ -74,7 +75,11 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { getInfo, register } from '@/api/register'
+import { loginByPasswd } from '@/api/user'
 import { successMessage, errorMessage } from '@/utils/message';
+
+import db from '@/utils/db';
+
 @Component
 export default class RedirectPageClass extends Vue {
     data = {
@@ -83,16 +88,20 @@ export default class RedirectPageClass extends Vue {
             name: ''
         }
     }
+    error = false
     departmentList = []
     // form = {}
     beforeCreate() {
         (this as any).form = this.$form.createForm(this);
     }
     async created() {
-        const { data } = (await getInfo(this.$route.query.uid as string)).data
-        this.data = data
-        this.departmentList = (this.data as any).association.department_list.split('&')
-        console.log(data)
+        try {
+            const { data } = (await getInfo(this.$route.query.uid as string)).data
+            this.data = data
+            this.departmentList = (this.data as any).association.department_list.split('&')
+        } catch (error) {
+            this.error = true
+        }
     }
 
     handleSubmit(e: any) {
@@ -100,11 +109,13 @@ export default class RedirectPageClass extends Vue {
       (this as any).form.validateFields(async (err: any, values: any) => {
         if (!err) {
             try {
-                await register({
+                const { data } = (await register({
                     uid: this.$route.query.uid,
                     ...values,
-                })
+                })).data
                 successMessage('用户注册成功')
+                db.token.set(`Bearer ${data}`)
+                this.$router.push('/index')
             } catch (error) {
                 errorMessage('用户注册失败')
             }
