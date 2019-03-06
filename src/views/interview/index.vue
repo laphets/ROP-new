@@ -142,9 +142,10 @@
                 :labelCol="{ span: 5 }"
                 :wrapperCol="{ span: 12 }"
                 fieldDecoratorId="location"
+                
                 :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入面试场地' }]}"
                 >
-                <a-input />
+                <a-input placeholder="请填写准确,如:小剧场B座208" />
                 </a-form-item>
 
                 <a-form-item
