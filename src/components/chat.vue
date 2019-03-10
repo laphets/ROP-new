@@ -4,6 +4,7 @@
         :title="`#${interviewId} 面试记录`"
         placement="right"
         :closable="false"
+        :width="450"
         @close="onClose"
         :visible="innerVisible"
         >
@@ -141,6 +142,10 @@ export default class ChatClass extends Vue {
 </script>
 
 <style lang="less" scoped>
+.message-container {
+    height: calc(100vh - 150px);
+    overflow: auto;
+}
 .sending-container {
     display: flex;
     justify-content: space-between;
