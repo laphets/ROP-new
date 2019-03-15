@@ -68,8 +68,8 @@
                 </div>
             </div>
             <div class="editor-container">
-                <div id="palette" style="height: 15%;"></div>
-                <div id="diagram" style="height: 85%;"></div>
+                <div id="palette"></div>
+                <div id="diagram"></div>
             </div>
             <a-modal
             title="编辑问题"
@@ -617,7 +617,7 @@ export default class InstancePageClass extends Vue {
             const node = model.nodeDataArray[this.editIndex] as any
             if (! node) { return }
             if (values.category) {
-                node.category = `${values.category}`
+                node.category = values.category
             }
             if (values.category !== 'SELECT') {
                 values.choiceCount = 0
@@ -713,6 +713,21 @@ canvas {
         }
         .editor-container {
             flex: 1;
+            position: relative;
+            #diagram {
+                height: 100%;
+                position: relative;
+            }
+            #palette {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+                // border-radius: 8px;
+                z-index:  23333;
+                position: absolute;
+                left: 2px;
+                top: 2px;
+                height: 60%;
+                width: 30%;
+            }
         }
     }
     .form-container {
