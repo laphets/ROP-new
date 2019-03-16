@@ -58,6 +58,9 @@
                             </a-form-item>
                         </a-form>
                     </a-modal>
+                    <a-button @click="() => {
+                        paletteText = paletteVisible ? '显示模板' : '隐藏模板'; paletteVisible = !paletteVisible
+                    }">{{paletteText}}</a-button>
                 </div>
                 <div class="right">
                     <a-button @click="handleClear">全部清空</a-button>
@@ -68,7 +71,7 @@
                 </div>
             </div>
             <div class="editor-container">
-                <div id="palette"></div>
+                <div id="palette" :style="{ display: paletteVisible ? 'block' : 'none' }"></div>
                 <div id="diagram"></div>
             </div>
             <a-modal
@@ -120,7 +123,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import go, { DraggingTool, Diagram, GraphLinksModel } from 'fuckgojs';
+import go, { DraggingTool, Diagram, GraphLinksModel, DiagramEvent, ChangedEvent, Palette } from 'fuckgojs';
 import screenfull from 'screenfull';
 import { RawForm, IForm, INode, IChoice } from '@/interfaces/form.interface';
 import { getFormList, updateForm, createForm } from '@/api/form';
@@ -147,6 +150,8 @@ export default class InstancePageClass extends Vue {
     editIndex = -1
     confirmLoading = false
     fullScreen = false
+    paletteText = '隐藏模板'
+    paletteVisible = true
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -368,11 +373,11 @@ export default class InstancePageClass extends Vue {
             })
         })
 
-        diagram.addDiagramListener('Modified', (e: any) => {
+        diagram.addDiagramListener('Modified', (e: DiagramEvent) => {
             this.buttonDisabled = !diagram.isModified
         })
 
-        diagram.addDiagramListener('ObjectDoubleClicked', async (e: any) => {
+        diagram.addDiagramListener('ObjectDoubleClicked', async (e: DiagramEvent) => {
             if (e.subject.panel instanceof go.Node && e.subject.panel.data) {
                 (this as any).form.resetFields()
                 const { data } = e.subject.panel
@@ -391,6 +396,21 @@ export default class InstancePageClass extends Vue {
                     this.reDisabled = (data.category === 'UPLOAD' || data.category === 'BOX' || data.category === 'SELECT')
                 }, 100)
             }
+        })
+
+        diagram.addModelChangedListener((e: ChangedEvent) => {
+            if (! e.isTransactionFinished) {
+                return
+            }
+            let txn = e.object
+            if (txn == null) {
+                return
+            }
+            (txn as any).changes.each((e: ChangedEvent) => {
+                if (e.change === go.ChangedEvent.Insert) {
+                    
+                }
+            })
         })
 
         const nodeStyle = [
@@ -558,7 +578,7 @@ export default class InstancePageClass extends Vue {
 
         this.diagram = diagram
 
-        //check fullscreen
+        // check fullscreen
         const checkfull = () => {
             const doc = document as any
             let isFull = doc.fullscreenEnabled || (window as any).fullScreen || doc.webkitIsFullScreen || doc.msFullscreenEnabled
@@ -705,10 +725,8 @@ canvas {
             justify-content: space-between;
             align-items: center;
             padding: 4px 4px;
-            .right {
-                button {
-                    margin: 0px 4px;
-                }
+            button {
+                margin: 0px 4px;
             }
         }
         .editor-container {
