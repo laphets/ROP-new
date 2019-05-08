@@ -100,7 +100,7 @@
             </div>
 
             <div class="method-container">
-                <a @click="passportLogin()">求是潮Passport登录</a>
+                <a style="border-radius: 5px;" @click="passportLogin()">求是潮Passport登录</a>
             </div>
 
         </div>
