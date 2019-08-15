@@ -62,7 +62,14 @@
                         <a-divider type="vertical" />
                         <a >二面分配</a>
                         <a-divider type="vertical" />
-                        <a class="error" @click="reject(record)">拒绝</a>
+                        <a-popconfirm
+                        title="真的要拒绝这位面试者吗？"
+                        @confirm="reject(record)"
+                        okText="是"
+                        cancelText="否"
+                        >
+                            <a class="error">拒绝</a>
+                        </a-popconfirm>
                     </span>
             </a-table>
         </div>

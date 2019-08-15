@@ -566,12 +566,12 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'TEXTAREA', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'INPUT', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'UPLOAD', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'BOX', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'SELECT', text: '请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1 }
+                    { category: 'TEXT', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'TEXTAREA', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'INPUT', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'UPLOAD', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'BOX', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'SELECT', text: '请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1, required: true }
                 ])
             }
         )
@@ -739,7 +739,7 @@ canvas {
             #palette {
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
                 // border-radius: 8px;
-                z-index:  23333;
+                z-index:  10;
                 position: absolute;
                 left: 2px;
                 top: 2px;
