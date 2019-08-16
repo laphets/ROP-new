@@ -18,6 +18,7 @@
             <div>
                 <public-sea v-if="curView == 0" :showmode.sync="mode"></public-sea>
                 <first-interview v-if="curView == 1" :showmode.sync="mode"></first-interview>
+                <second-interview v-if="curView == 2" :showmode.sync="mode"></second-interview>
             </div>
         </div>
 
@@ -179,6 +180,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import secondInterview from './second.vue'
 import firstInterview from './first.vue'
 import publicSea from './publicsea.vue'
 
@@ -192,6 +194,7 @@ import { successMessage } from '@/utils/message';
 
 @Component({
     components: {
+        secondInterview,
         firstInterview,
         publicSea
     }

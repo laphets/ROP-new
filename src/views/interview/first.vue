@@ -60,7 +60,19 @@
                         
                         <a @click="showInfo(record)">查看信息</a>
                         <a-divider type="vertical" />
-                        <a >二面分配</a>
+                        <a-dropdown>
+                            <a class="ant-dropdown-link">
+                            二面分配 <a-icon type="down" />
+                            </a>
+                            <a-menu slot="overlay" @click="({key}) => onAssign(key, record)">
+                            <a-menu-item>
+                                <a href="javascript:;" key="auto">自动分配</a>
+                            </a-menu-item>
+                            <a-menu-item>
+                                <a href="javascript:;" key="manual">手动分配</a>
+                            </a-menu-item>
+                            </a-menu>
+                        </a-dropdown>
                         <a-divider type="vertical" />
                         <a-popconfirm
                         title="真的要拒绝这位面试者吗？"
@@ -87,6 +99,33 @@
                 </div>
                 
             </div>
+        </a-modal>
+        <a-modal
+        title="加入一个场次"
+        v-model="checkGroupVisible"
+        :confirmLoading="submitLoading"
+        @ok="handleJoinSubmit"
+        okText="确认"
+        cancelText="取消"
+        >
+            <a-form :autoFormCreate="(form)=>{this.form = form}">
+
+                <a-form-item
+                label='二面场次'
+                :labelCol="{ span: 5 }"
+                :wrapperCol="{ span: 12 }"
+                fieldDecoratorId="target_interview_id"
+                :fieldDecoratorOptions="{rules: [{ required: true, message: '请选择一个二面组别' }]}"
+                >
+                <a-select
+                    placeholder='请选择一个二面场次以加入'
+                >
+                    <a-select-option v-for="(item, index) in availableGroup" :key="item.ID" :value='item.ID'>{{item.name}}</a-select-option>
+                    <!-- <a-select-option :value='2'>测试报名表</a-select-option> -->
+                </a-select>
+                </a-form-item>
+                
+            </a-form>
         </a-modal>
     </div>
 </template>
@@ -156,6 +195,36 @@ export default class FirstClass extends Vue {
             })).data).data
         } catch (error) {
 
+        }
+    }
+
+
+    checkGroupVisible = false
+    availableGroup = []
+    assign_mode = ""
+    waitingIntents: any = [] 
+    async onAssign(key: any, record: any) {
+        this.waitingIntents = [record.intent_id]
+        if (key === 'item_0') {
+            this.assign_mode = "auto"
+        } else if (key === "item_1") {
+            this.assign_mode = "manual"
+        }
+        
+        if (this.assign_mode === "auto") {
+            try {
+                await intentAPI.assign({assign_mode: this.assign_mode, intents: [record.intent_id]})
+                successMessage(`操作成功~`)
+            } catch (error) {
+                
+            }
+        } else if (this.assign_mode === "manual") {
+            this.availableGroup = ((await getInterviewList({
+                interview_type: 2,
+                auto_joinable: -1,
+                department: record.department
+            })).data).data
+            this.checkGroupVisible = true
         }
     }
 
