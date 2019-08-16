@@ -115,7 +115,7 @@ export default class PublicSeaClass extends Vue {
         { title: 'ID', width: 70, dataIndex: 'intent_id', key: 'id', fixed: 'left' },
         { title: '姓名', width: 120, dataIndex: 'name', key: 'name', fixed: 'left' },
         { title: '学号', dataIndex: 'ZJUid', key: '2', width: 150 },
-        { title: '分配状态', dataIndex: 'sub_stage_str', key: '5', width: 150 },
+        { title: '一面分配状态', dataIndex: 'sub_stage_str', key: '5', width: 150 },
         { title: '面试组别', dataIndex: 'target_interview_str', key: '6', width: 150 },
         { title: '部门', dataIndex: 'department', key: '1', width: 150 },
         { title: '手机号', dataIndex: 'mobile', key: '3', width: 150 },

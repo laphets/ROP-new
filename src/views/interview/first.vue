@@ -177,8 +177,7 @@ export default class FirstClass extends Vue {
         { title: '主面试官', dataIndex: 'interview.director', key: '2', width: 150 },
         { title: '时间', dataIndex: 'interview.start_time', key: '3', width: 250 },
         { title: '面试组名', dataIndex: 'interview.name', key: 'name', width: 150 },
-        { title: '主状态', dataIndex: 'main_stage', key: 'main_stage', width: 100 },
-        { title: '副状态', dataIndex: 'sub_stage', key: 'sub_stage', width: 100 },
+        { title: '二面分配状态', dataIndex: 'sub_stage_str', key: '5', width: 150 },
         {
             title: '操作',
             key: 'operation',
@@ -197,15 +196,16 @@ export default class FirstClass extends Vue {
             department: this.$route.name
         })).data).data
         console.log(this.$route.name)
-        // const substage_map = ['', '', '已分配未确认']
+        const substage_map = ['未知', '未分配', '已分配未确认']
         this.intentList = ((await getIntentList({mainStage: 'First', department: this.$route.name})).data).data
-        // .map(item => {
-        //     return {
-        //         ...item,
-        //         sub_stage_str: substage_map[item.sub_stage],
-        //         target_interview_str: item.target_interview_id === 0 ? '自动分配' : `${item.target_interview_id}`
-        //     }
-        // })
+            .map((item: any) => {
+                console.log("item:", item)
+                item.interview.start_time = this.prase_time(item.interview.start_time)
+                return {
+                    ...item,
+                    sub_stage_str: substage_map[item.sub_stage]
+                }
+            })
     }
 
     chatVisible = false;
