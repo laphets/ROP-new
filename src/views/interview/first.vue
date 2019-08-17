@@ -228,6 +228,25 @@ export default class FirstClass extends Vue {
         }
     }
 
+    submitLoading = false
+    handleJoinSubmit(e: any) {
+        (this as any).form.validateFields(async (err: boolean, values: any) => {
+            if (!err) {
+                this.submitLoading = true;
+                try {
+                    // console.log(values)
+                    await intentAPI.assign({assign_mode: this.assign_mode, intents: this.waitingIntents, target_interview_id: values.target_interview_id})
+
+                    this.submitLoading = false
+                    this.checkGroupVisible = false
+                    successMessage('面试分组创建成功~')
+                } catch (error) {
+                    this.submitLoading = false;
+                }
+            }
+        })
+    }
+
     modal_content = {}
     modalVisable = false
     showInfo(record: any) {
