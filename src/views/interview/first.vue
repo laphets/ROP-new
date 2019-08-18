@@ -55,7 +55,7 @@
             </a-row>
         </div>
         <div v-else class="list-container">
-            <a-table :columns="columns" :dataSource="intentList" :scroll="{ x: 1300, y: 400 }">
+            <a-table :columns="columns" :dataSource="intentList" :scroll="{ x: 1300, y: 400 }" :loading="loading">
                     <span slot="action" slot-scope="text, record">
                         
                         <a @click="showInfo(record)">查看信息</a>
@@ -278,22 +278,23 @@ export default class FirstClass extends Vue {
     interviewList = []
     intentList = []
 
+    loading = true
     async created() {
+        this.loading = true
         this.interviewList = ((await getInterviewList({
             interview_type: 1,
             department: this.$route.name
         })).data).data
-        console.log(this.$route.name)
         const substage_map = ['未知', '未分配', '已分配未确认']
         this.intentList = ((await getIntentList({mainStage: 'First', department: this.$route.name})).data).data
             .map((item: any) => {
-                console.log("item:", item)
                 item.interview.start_time = this.prase_time(item.interview.start_time)
                 return {
                     ...item,
                     sub_stage_str: substage_map[item.sub_stage]
                 }
             })
+        this.loading = false
     }
 
     chatVisible = false;

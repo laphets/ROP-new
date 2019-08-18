@@ -112,7 +112,7 @@ export default class PublicSeaClass extends Vue {
     createGroupVisable = false
 
     columns = [
-        { title: 'ID', width: 70, dataIndex: 'intent_id', key: 'id', fixed: 'left' },
+        { title: '编号', width: 70, dataIndex: 'intent_id', key: 'id', fixed: 'left' },
         { title: '姓名', width: 120, dataIndex: 'name', key: 'name', fixed: 'left' },
         { title: '学号', dataIndex: 'ZJUid', key: '2', width: 150 },
         { title: '一面分配状态', dataIndex: 'sub_stage_str', key: '5', width: 150 },
