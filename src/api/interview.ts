@@ -11,6 +11,7 @@ export const createInterview = (data: any) => {
 }
 
 export const getInterviewList = (conditions?: any) => {
+    conditions.department = conditions.department === 'interviewoverview' ? undefined : conditions.department
     const query = queryString.stringify({ instanceId: store.getters.instanceId, ...conditions })
     return request.get(`v1/interview?${query}`)
 }
