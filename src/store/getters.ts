@@ -25,7 +25,7 @@ export default {
     avatar: state => state.user.avatar,
     department: state => state.user.department,
     token: state => state.user.token,
-    instancdId: state => state.app.instanceId,
+    instanceId: state => state.app.instanceId,
     instanceName: state => state.app.instanceName,
     routers: state => state.router.routers,
     smsBalance: state => state.user.smsBalance,
