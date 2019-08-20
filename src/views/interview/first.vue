@@ -55,7 +55,7 @@
             </a-row>
         </div>
         <div v-else class="list-container">
-            <a-table :columns="columns" :dataSource="intentList" :scroll="{ x: 1300, y: 400 }" :loading="loading">
+            <a-table :columns="columns" :dataSource="intentList" :scroll="{ x: 1300 }" :loading="loading">
                     <span slot="action" slot-scope="text, record">
                         
                         <a @click="showInfo(record)">查看信息</a>

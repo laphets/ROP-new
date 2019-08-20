@@ -1,6 +1,6 @@
 <template>
     <div class="list-container">
-        <a-table :columns="columns" :dataSource="data" :scroll="{ x: 800, y: 450 }" :loading="loading">
+        <a-table :columns="columns" :dataSource="data" :scroll="{ x: 800 }" :loading="loading">
                 <span slot="action" slot-scope="text, record">
                     <a @click="showInfo(record)" >查看信息</a>
                 </span>
@@ -58,9 +58,9 @@ export default class RejectBinClass extends Vue {
         { title: '编号', width: 70, dataIndex: 'intent_id', key: 'id', fixed: 'left' },
         { title: '姓名', width: 120, dataIndex: 'name', key: 'name', fixed: 'left' },
         { title: '学号', dataIndex: 'ZJUid', key: '2', width: 150 },
-        { title: '部门', dataIndex: 'department', key: '1', width: 150 },
+        { title: '部门', dataIndex: 'department', key: '1', width: 200 },
         { title: '手机号', dataIndex: 'mobile', key: '3', width: 150 },
-        { title: '邮箱', dataIndex: 'email', key: '4', width: 150 },
+        { title: '邮箱', dataIndex: 'email', key: '4', width: 250 },
         {
             title: '操作',
             key: 'operation',
