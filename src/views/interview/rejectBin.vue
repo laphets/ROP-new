@@ -58,7 +58,7 @@ export default class RejectBinClass extends Vue {
         { title: '编号', width: 70, dataIndex: 'intent_id', key: 'id', fixed: 'left' },
         { title: '姓名', width: 120, dataIndex: 'name', key: 'name', fixed: 'left' },
         { title: '学号', dataIndex: 'ZJUid', key: '2', width: 150 },
-        { title: '部门', dataIndex: 'department', key: '1', width: 200 },
+        { title: '部门', dataIndex: 'department', key: '1', width: 250 },
         { title: '手机号', dataIndex: 'mobile', key: '3', width: 150 },
         { title: '邮箱', dataIndex: 'email', key: '4', width: 250 },
         {

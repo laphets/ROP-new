@@ -261,10 +261,10 @@ export default class FirstClass extends Vue {
     columns = [
         { title: '编号', width: 70, dataIndex: 'ID', key: 'ID', fixed: 'left' },
         { title: '面试者', width: 120, dataIndex: 'name', key: 'interview_id', fixed: 'left' },
-        { title: '部门', dataIndex: 'department', key: 'department', width: 150 },
+        { title: '部门', dataIndex: 'department', key: 'department', width: 250 },
         { title: '主面试官', dataIndex: 'interview.director', key: '2', width: 150 },
         { title: '时间', dataIndex: 'interview.start_time', key: '3', width: 250 },
-        { title: '面试组名', dataIndex: 'interview.name', key: 'name', width: 150 },
+        { title: '面试组名', dataIndex: 'interview.name', key: 'name', width: 250 },
         { title: '二面分配状态', dataIndex: 'sub_stage_str', key: '5', width: 150 },
         {
             title: '操作',
