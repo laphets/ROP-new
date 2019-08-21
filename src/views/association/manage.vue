@@ -16,15 +16,18 @@
                     <a-button v-else @click="onLoadMore">loading more</a-button>
                     </div> -->
                     <a-list-item slot="renderItem" slot-scope="item, index">
+                    <a slot="actions" @click="showPermissionModal(item)">更改权限</a>
                     <a slot="actions">管理</a>
                     <a slot="actions">更多</a>
                     <a-list-item-meta
                         :description="`${item.association_name}-${item.department} - Last Seen: ${get_relative_time(item.last_seen)}`"
                     >
-                        <a slot="title" href="#">{{item.inner_id ? item.inner_id : item.name}}</a>
+                        <a slot="title" href="#">
+                            {{item.inner_id ? item.inner_id : item.name}}
+                            <a-tag class="user-type" :color=tagColorList[item.admin_level]>{{typeList[item.admin_level]}}</a-tag>
+                        </a>                     
                             <a-avatar v-if="!item.avatar" slot="avatar" :style="{backgroundColor: colorList[index % colorList.length], verticalAlign: 'middle'}"> {{item.inner_id ? item.inner_id[0] : item.name[0]}} </a-avatar>
                             <a-avatar v-else slot="avatar" :src="item.avatar" :style="{ verticalAlign: 'middle'}"> </a-avatar>
-
                     </a-list-item-meta>
                     <div>提醒面试</div>
                     </a-list-item>
@@ -36,13 +39,25 @@
                 @cancel="handleCancel"
                 @create="handleCreate"
             />
+            <a-modal
+                :visible="permissionEditVisible"
+                :title="`修改${editedUser.inner_id ? editedUser.inner_id : editedUser.name}的权限`"
+                @cancel="permissionEditCancel"
+                @ok="permissionEditOk"
+            >
+                <a-radio-group v-model="editedUser.admin_level">
+                    <a-radio :value='2'>全局管理员</a-radio>
+                    <a-radio :value='1'>组织管理员</a-radio>
+                    <a-radio :value='0'>普通用户</a-radio>
+                </a-radio-group>
+            </a-modal>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { getUserList, addUser } from '@/api/association';
+import { getUserList, addUser, updatePermission } from '@/api/association';
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -63,6 +78,10 @@ export default class AssociationManagePageClass extends Vue {
     loadingMore = false;
     showLoadingMore = true;
     visible = false;
+    tagColorList = ['blue', 'orange', 'red']
+    typeList = ['普通用户', '组织管理员', '全局管理员']
+    permissionEditVisible = false
+    editedUser = {}
 
     get_relative_time(time: string) {
         return time === '0001-01-01T00:00:00Z' ? '很久以前' : moment(new Date(time)).fromNow()
@@ -83,26 +102,48 @@ export default class AssociationManagePageClass extends Vue {
         this.visible = true;
     }
     handleCancel() {
-      this.visible = false;
+        this.visible = false;
     }
     handleCreate() {
-      const form = (this.$refs.collectionForm as any).form;
-      form.validateFields(async (err: any, values: any) => {
-        if (err) {
-          return;
-        }
+        const form = (this.$refs.collectionForm as any).form;
+        form.validateFields(async (err: any, values: any) => {
+            if (err) {
+                return;
+            }
 
+            try {
+                const data = await addUser(values)
+                this.initData()
+                successMessage('用户创建成功')
+                form.resetFields();
+                this.visible = false;
+            } catch (error) {
+                errorMessage('用户创建失败')
+                return
+            }
+        });
+    }
+
+    showPermissionModal(item: any) {
+        this.editedUser = JSON.parse(JSON.stringify(item))
+        this.permissionEditVisible = true
+    }
+
+    permissionEditCancel() {
+        this.permissionEditVisible = false
+    }
+
+    async permissionEditOk() {
         try {
-            const data = await addUser(values)
+            const { id, admin_level } = (this.editedUser as any)
+            await updatePermission({user_id: id, admin_level: admin_level})
+            this.permissionEditVisible = false
+            successMessage('修改成功')
             this.initData()
-            successMessage('用户创建成功')
-            form.resetFields();
-            this.visible = false;
         } catch (error) {
-            errorMessage('用户创建失败')
+            errorMessage('修改失败')
             return
         }
-      });
     }
 }
 </script>

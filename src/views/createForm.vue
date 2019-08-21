@@ -58,6 +58,9 @@
                             </a-form-item>
                         </a-form>
                     </a-modal>
+                    <a-button @click="() => {
+                        paletteText = paletteVisible ? '显示模板' : '隐藏模板'; paletteVisible = !paletteVisible
+                    }">{{paletteText}}</a-button>
                 </div>
                 <div class="right">
                     <a-button @click="handleClear">全部清空</a-button>
@@ -68,8 +71,8 @@
                 </div>
             </div>
             <div class="editor-container">
-                <div id="palette" style="height: 15%;"></div>
-                <div id="diagram" style="height: 85%;"></div>
+                <div id="palette" :style="{ display: paletteVisible ? 'block' : 'none' }"></div>
+                <div id="diagram"></div>
             </div>
             <a-modal
             title="编辑问题"
@@ -120,7 +123,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import go, { DraggingTool, Diagram, GraphLinksModel } from 'fuckgojs';
+import go, { DraggingTool, Diagram, GraphLinksModel, DiagramEvent, ChangedEvent, Palette } from 'fuckgojs';
 import screenfull from 'screenfull';
 import { RawForm, IForm, INode, IChoice } from '@/interfaces/form.interface';
 import { getFormList, updateForm, createForm } from '@/api/form';
@@ -147,6 +150,8 @@ export default class InstancePageClass extends Vue {
     editIndex = -1
     confirmLoading = false
     fullScreen = false
+    paletteText = '隐藏模板'
+    paletteVisible = true
 
     async getData() {
         const { data } = (await getFormList()).data
@@ -368,11 +373,11 @@ export default class InstancePageClass extends Vue {
             })
         })
 
-        diagram.addDiagramListener('Modified', (e: any) => {
+        diagram.addDiagramListener('Modified', (e: DiagramEvent) => {
             this.buttonDisabled = !diagram.isModified
         })
 
-        diagram.addDiagramListener('ObjectDoubleClicked', async (e: any) => {
+        diagram.addDiagramListener('ObjectDoubleClicked', async (e: DiagramEvent) => {
             if (e.subject.panel instanceof go.Node && e.subject.panel.data) {
                 (this as any).form.resetFields()
                 const { data } = e.subject.panel
@@ -391,6 +396,21 @@ export default class InstancePageClass extends Vue {
                     this.reDisabled = (data.category === 'UPLOAD' || data.category === 'BOX' || data.category === 'SELECT')
                 }, 100)
             }
+        })
+
+        diagram.addModelChangedListener((e: ChangedEvent) => {
+            if (! e.isTransactionFinished) {
+                return
+            }
+            let txn = e.object
+            if (txn == null) {
+                return
+            }
+            (txn as any).changes.each((e: ChangedEvent) => {
+                if (e.change === go.ChangedEvent.Insert) {
+                    
+                }
+            })
         })
 
         const nodeStyle = [
@@ -546,19 +566,19 @@ export default class InstancePageClass extends Vue {
                 scrollsPageOnFocus: false,
                 nodeTemplateMap: diagram.nodeTemplateMap,
                 model: new go.GraphLinksModel([
-                    { category: 'TEXT', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'TEXTAREA', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'INPUT', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'UPLOAD', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'BOX', text: '请输入问题', choices: [defaultPort] },
-                    { category: 'SELECT', text: '请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1 }
+                    { category: 'TEXT', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'TEXTAREA', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'INPUT', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'UPLOAD', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'BOX', text: '请输入问题', choices: [defaultPort], required: true },
+                    { category: 'SELECT', text: '请输入问题', choices: [ defaultPort, { id: 1, text: 'A' }, { id: 2, text: 'B' }, { id: 3, text: 'C' }, { id: 4, text: 'D' } ], available_cnt: 1, required: true }
                 ])
             }
         )
 
         this.diagram = diagram
 
-        //check fullscreen
+        // check fullscreen
         const checkfull = () => {
             const doc = document as any
             let isFull = doc.fullscreenEnabled || (window as any).fullScreen || doc.webkitIsFullScreen || doc.msFullscreenEnabled
@@ -617,7 +637,7 @@ export default class InstancePageClass extends Vue {
             const node = model.nodeDataArray[this.editIndex] as any
             if (! node) { return }
             if (values.category) {
-                node.category = `${values.category}`
+                node.category = values.category
             }
             if (values.category !== 'SELECT') {
                 values.choiceCount = 0
@@ -705,14 +725,28 @@ canvas {
             justify-content: space-between;
             align-items: center;
             padding: 4px 4px;
-            .right {
-                button {
-                    margin: 0px 4px;
-                }
+            button {
+                margin: 0px 4px;
             }
         }
         .editor-container {
             flex: 1;
+            position: relative;
+            #diagram {
+                height: 100%;
+                position: relative;
+            }
+            #palette {
+                background-color: rgba(255, 255, 255, 0.7);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+                // border-radius: 8px;
+                z-index:  10;
+                position: absolute;
+                left: 2px;
+                top: 2px;
+                height: 60%;
+                width: 30%;
+            }
         }
     }
     .form-container {

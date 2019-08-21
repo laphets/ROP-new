@@ -72,6 +72,26 @@ export const asyncRoutes: MyRouteConfig[] = [
         ]
     },
     {
+        path: '/form',
+        component: Layout,
+        name: 'form',
+        redirect: '/form/create',
+        meta: {
+            title: '纳新表单'
+        },
+        children: [
+            {
+                path: 'create',
+                name: 'createForm',
+                component: CreateForm,
+                meta: {
+                    title: '新建表单',
+                    icon: 'form'
+                }
+            },
+        ]
+    },
+    {
         path: '/instance',
         component: Layout,
         redirect: '/instance/view',
@@ -137,26 +157,6 @@ export const asyncRoutes: MyRouteConfig[] = [
                 component: Interview,
                 meta: {
                     title: '名单总览'
-                }
-            },
-        ]
-    },
-    {
-        path: '/form',
-        component: Layout,
-        name: 'form',
-        redirect: '/form/create',
-        meta: {
-            title: '纳新表单'
-        },
-        children: [
-            {
-                path: 'create',
-                name: 'createForm',
-                component: CreateForm,
-                meta: {
-                    title: '新建表单',
-                    icon: 'form'
                 }
             },
         ]

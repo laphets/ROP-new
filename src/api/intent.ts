@@ -5,8 +5,15 @@ import store from '@/store';
 
 
 export const getIntentList = ({mainStage, department}: any) => {
-    const query = queryString.stringify({instanceId: store.getters.instancdId, mainStage, department})
+    department = department === 'interviewoverview' ? undefined : department
+    const query = queryString.stringify({instanceId: store.getters.instanceId, mainStage, department})
     return request.get(`v1/intent?${query}`)
+}
+
+export const getRejectedIntentList = (department: any) => {
+    department = department === 'interviewoverview' ? undefined : department
+    const query = queryString.stringify({instanceId: store.getters.instanceId, department})
+    return request.get(`v1/intent/rejected?${query}`)
 }
 
 export const assign = (data: any) => {

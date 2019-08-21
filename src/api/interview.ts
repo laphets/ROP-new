@@ -6,12 +6,13 @@ import store from '@/store';
 
 
 export const createInterview = (data: any) => {
-    const query = queryString.stringify({instanceId: store.getters.instancdId})
+    const query = queryString.stringify({instanceId: store.getters.instanceId})
     return request.post(`v1/interview?${query}`, data)
 }
 
 export const getInterviewList = (conditions?: any) => {
-    const query = queryString.stringify({ instanceId: store.getters.instancdId, ...conditions })
+    conditions.department = conditions.department === 'interviewoverview' ? undefined : conditions.department
+    const query = queryString.stringify({ instanceId: store.getters.instanceId, ...conditions })
     return request.get(`v1/interview?${query}`)
 }
 

@@ -8,8 +8,8 @@
                     </div>
                 </div>
                 <div class="right-opt">
-                    <a-button :disabled="curView == 0" @click="mode='card'" :type="mode == 'card' ? 'primary' : 'default'">卡片模式</a-button>
-                    <a-button :disabled="curView == 0" @click="mode='list'" :type="mode == 'card' ? 'default' : 'primary'">列表模式</a-button>
+                    <a-button :disabled="isCardDisabled()" @click="mode='card'" :type="mode == 'card' ? 'primary' : 'default'">卡片模式</a-button>
+                    <a-button :disabled="isCardDisabled()" @click="mode='list'" :type="mode == 'card' ? 'default' : 'primary'">列表模式</a-button>
                     <a-divider type="vertical" />
                     <a-button @click="showCreateGroup()" type="dashed">新建面试分组</a-button>
                 </div>
@@ -18,6 +18,8 @@
             <div>
                 <public-sea v-if="curView == 0" :showmode.sync="mode"></public-sea>
                 <first-interview v-if="curView == 1" :showmode.sync="mode"></first-interview>
+                <second-interview v-if="curView == 2" :showmode.sync="mode"></second-interview>
+                <reject-bin v-if="curView == 3" :showmode.sync="mode"></reject-bin>
             </div>
         </div>
 
@@ -179,8 +181,10 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import secondInterview from './second.vue'
 import firstInterview from './first.vue'
 import publicSea from './publicsea.vue'
+import rejectBin from './rejectBin.vue'
 
 
 import { createInterview } from '@/api/interview'
@@ -192,6 +196,8 @@ import { successMessage } from '@/utils/message';
 
 @Component({
     components: {
+        rejectBin,
+        secondInterview,
         firstInterview,
         publicSea
     }
@@ -207,9 +213,14 @@ export default class InterviewPageClass extends Vue {
     viewType = [
         '公海',
         '一面',
-        '二面'
+        '二面',
+        '已拒绝'
     ]
     
+    isCardDisabled() {
+        return this.curView === 0 || this.curView === 3
+    }
+
     created() {
         this.department = this.$route.name
     }
