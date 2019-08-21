@@ -234,6 +234,7 @@ export default class InterviewPageClass extends Vue {
     createGroupVisable = false
     async showCreateGroup() {
         this.departmentList = this.departmentString.split('&')
+        this.departmentList.push("联合面试")
         this.createGroupVisable = true
     }
 

@@ -15,6 +15,12 @@
                         <a-menu-item>
                             <a href="javascript:;" key="manual">手动分配</a>
                         </a-menu-item>
+                        <a-menu-item>
+                            <a href="javascript:;" key="autounion">自动分配(联合面试)</a>
+                        </a-menu-item>
+                        <a-menu-item>
+                            <a href="javascript:;" key="manualunion">手动分配(联合面试)</a>
+                        </a-menu-item>
                         </a-menu>
                     </a-dropdown>
                     <a-divider type="vertical" />
@@ -159,9 +165,20 @@ export default class PublicSeaClass extends Vue {
             this.assign_mode = "auto"
         } else if (key === "item_1") {
             this.assign_mode = "manual"
+        } else if (key === "item_2") {
+            this.assign_mode = "auto_union"
+        } else if (key === "item_3") {
+            this.assign_mode = "manual_union"
         }
         
         if (this.assign_mode === "auto") {
+            try {
+                await intentAPI.assign({assign_mode: this.assign_mode, intents: [record.intent_id]})
+                successMessage(`操作成功~`)
+            } catch (error) {
+                
+            }
+        } else if (this.assign_mode === "auto_union") {
             try {
                 await intentAPI.assign({assign_mode: this.assign_mode, intents: [record.intent_id]})
                 successMessage(`操作成功~`)
@@ -175,7 +192,15 @@ export default class PublicSeaClass extends Vue {
                 department: record.department
             })).data).data
             this.checkGroupVisible = true
-        }
+        } else if (this.assign_mode === "manual_union") {
+            this.availableGroup = ((await getInterviewList({
+                interview_type: 1,
+                auto_joinable: -1,
+                department: "联合面试"
+            })).data).data
+            // this.assign_mode = "manual"
+            this.checkGroupVisible = true
+        } 
     }
 
     submitLoading = false
