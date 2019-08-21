@@ -125,7 +125,7 @@ export default class AssociationManagePageClass extends Vue {
     }
 
     showPermissionModal(item: any) {
-        this.editedUser = item
+        this.editedUser = JSON.parse(JSON.stringify(item))
         this.permissionEditVisible = true
     }
 
