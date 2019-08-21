@@ -40,7 +40,7 @@
                     <img v-if="avatar" class="user-avatar" :src="avatar">
                     <a-avatar v-else class="user-avatar-a" slot="avatar" :style="{backgroundColor: '#7265e6', verticalAlign: 'middle'}"> {{innerId? innerId[0] : name[0]}} </a-avatar>
                     <span class="user-name">{{department}}  {{innerId? innerId: name}}</span>
-                    <a-tag class="user-type" color="blue">{{getAdminType()}}</a-tag>
+                    <a-tag class="user-type" :color=colorList[adminLevel]>{{typeList[adminLevel]}}</a-tag>
                 </div>
                 <a-menu class="user-dropdown" slot="overlay" @click="meToogle">
                     <a-menu-item key="1">
@@ -76,13 +76,11 @@ export default class NavbarClass extends Vue {
     @Getter('avatar') avatar!: string;
     @Getter('smsBalance') smsBalance!: number;
 
-    created() {
-        console.log(this.smsBalance)
-    }
+    colorList = ['blue', 'orange', 'red']
+    typeList = ['普通用户', '组织管理员', '全局管理员']
 
-    getAdminType() {
-        let typeList = ['普通用户', '组织管理员', '全局管理员']
-        return typeList[this.adminLevel]
+    created() {
+
     }
 
     instanceToogle({ key }: any) {
