@@ -45,7 +45,7 @@
                 @cancel="permissionEditCancel"
                 @ok="permissionEditOk"
             >
-                <a-radio-group v-bind="editedUser.admin_level">
+                <a-radio-group v-model="editedUser.admin_level">
                     <a-radio :value='2'>全局管理员</a-radio>
                     <a-radio :value='1'>组织管理员</a-radio>
                     <a-radio :value='0'>普通用户</a-radio>
@@ -138,6 +138,8 @@ export default class AssociationManagePageClass extends Vue {
             const { id, admin_level } = (this.editedUser as any)
             await updatePermission({user_id: id, admin_level: admin_level})
             this.permissionEditVisible = false
+            successMessage('修改成功')
+            this.initData()
         } catch (error) {
             errorMessage('修改失败')
             return
