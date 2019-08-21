@@ -45,7 +45,7 @@
                 @cancel="permissionEditCancel"
                 @ok="permissionEditOk"
             >
-                <a-radio-group v-model="editedUser.admin_level">
+                <a-radio-group v-bind="editedUser.admin_level">
                     <a-radio :value='2'>全局管理员</a-radio>
                     <a-radio :value='1'>组织管理员</a-radio>
                     <a-radio :value='0'>普通用户</a-radio>
