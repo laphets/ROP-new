@@ -13,7 +13,7 @@
     "fuckgojs": "2.0.0",
     "jr-qrcode": "^1.1.4",
     "moment": "^2.22.2",
-    "npm": "^6.6.0",
+    "npm": "^6.13.4",
     "query-string": "^6.1.0",
     "screenfull": "^4.0.1",
     "socket.io-client": "^2.2.0",
